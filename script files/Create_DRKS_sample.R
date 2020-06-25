@@ -53,7 +53,7 @@ affil_columns <- paste0("address.affiliation",0:4)
 affiliations <- apply(DRKS_sample[affil_columns], 1, paste, collapse = " ")
 
 # Load search terms for the affiliations/cities
-city_search_terms <- readLines("data/city_search_terms_no_abbrev.csv") %>%
+city_search_terms <- readLines("data/city_search_terms_no_abbrev.csv", encoding = "UTF-8") %>%
   str_split(";")
 cities <- city_search_terms %>% map_chr(1)
 city_search_terms <- city_search_terms %>%
@@ -137,6 +137,26 @@ DRKS_sample <- DRKS_sample %>%
   add_column(nct_id = ncts) %>%
   filter(has_nct_id == FALSE)
 
+DRKS_sample_save <- DRKS_sample %>%
+  rename(startDate_plannedActual = plannedActual) %>% 
+  select(drksId, cities_lead, title,
+         firstDrksPublishDate, startDate,
+         startDate_plannedActual, studyEnd,
+         intervention.category0, intervention.value0,
+         intervention.category1, intervention.value1,
+         intervention.category2, intervention.value2,
+         address.type0, address.affiliation0, 
+         address.firstname0, address.lastname0,
+         address.type1, address.affiliation1, 
+         address.firstname1, address.lastname1,
+         targetSize, recruitmentStatus,
+         investorInitiated, monoMultiCentric,
+         publication.category0, publication.type0, publication.value0,
+         publication.category1, publication.type1, publication.value1,
+         publication.category2, publication.type2, publication.value2,
+         publication.category3, publication.type3, publication.value3,
+         publication.category4, publication.type4, publication.value4)
+
 
 #save DRKS trial sample
-write_delim(DRKS_sample, "data/DRKS_sample.csv", delim = ";", na = "")
+write_delim(DRKS_sample_save, "data/DRKS_sample_search_term_upd.csv", delim = ";", na = "")

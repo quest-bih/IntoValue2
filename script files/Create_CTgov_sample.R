@@ -188,5 +188,5 @@ CTgov_sample <- CTgov_sample %>%
 #save CT.gov trial sample
 #please be aware that not all associations of the trials to the cites are correct (there are still false positives)
 #such that the city associations had to be checked manually during publication search
-write_delim(CTgov_sample, "data/IntoValue2_CTgov_sample_no_abbrev.csv", delim = ";", na = "")
+write_delim(CTgov_sample, "data/IntoValue2_CTgov_sample_search_term_upd.csv", delim = ";", na = "")
 
