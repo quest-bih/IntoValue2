@@ -185,8 +185,20 @@ CTgov_sample <- CTgov_sample %>%
   left_join(AACT_datasets$calculated_values, by = "nct_id")
 
 
+
+CTgov_sample_save <- CTgov_sample %>%
+  rename(PI_name = name,
+         PI_affiliation = affiliation,
+         interventions = intervention_names_comb) %>% 
+  select(nct_id, cities_lead, brief_title, official_title,
+         study_first_submitted_date, start_date, start_date_type,
+         completion_date, completion_date_type, PI_name,
+         PI_affiliation, interventions, overall_status,
+         phase, enrollment, enrollment_type, were_results_reported)
+
+
 #save CT.gov trial sample
 #please be aware that not all associations of the trials to the cites are correct (there are still false positives)
 #such that the city associations had to be checked manually during publication search
-write_delim(CTgov_sample, "data/IntoValue2_CTgov_sample_search_term_upd.csv", delim = ";", na = "")
+write_delim(CTgov_sample_save, "data/IntoValue2_CTgov_sample_search_term_upd.csv", delim = ";", na = "")
 
