@@ -167,6 +167,25 @@ write_csv(city_statistics_lead, "results_for_paper/city_statistics.csv")
 
 
 
+city_statistics_lead$fill_col <- "#006780"
+city_statistics_lead[city_statistics_lead$City == "All" ,]$fill_col <- "#D78102"
+city_order <- (city_statistics_lead %>% arrange(-Percentage))$City
+city_statistics_lead$City <- factor(city_statistics_lead$City, 
+                                             levels=city_order)
+
+ggplot(data=city_statistics_lead, 
+       aes(x=City, y=Percentage, 
+           fill = fill_col)) + 
+  geom_bar(position = 'stack', stat='identity', fill = city_statistics_lead$fill_col, colour="#444444", size = 0.6) +
+  #scale_fill_manual(values = c("#bcbcc3", "#0085A6", "#006780")) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.4),
+        axis.text=element_text(size=14),
+        axis.title=element_text(size=16),
+        legend.position = "none") +
+  xlab("City") + ylab("Percentage published < 2 years")
+ggsave("results_for_paper/City_hist_2y.png", width = 35, height = 18, units = "cm", dpi = 600)
+
+
 #additional table for 5 years
 
 #we finished the publication search beginning of Dec. 2020
@@ -187,19 +206,41 @@ write_csv(city_statistics_lead_5y, "results_for_paper/city_statistics_5years.csv
 
 
 
-unpublished_trials_5y <- IntoValue_dataset_cities_5y %>% 
-  filter(!has_publication)
+city_statistics_lead_5y$fill_col <- "#006780"
+city_statistics_lead_5y[city_statistics_lead_5y$City == "All" ,]$fill_col <- "#D78102"
+city_order <- (city_statistics_lead_5y %>% arrange(-Percentage))$City
+city_statistics_lead_5y$City <- factor(city_statistics_lead_5y$City, 
+                                    levels=city_order)
 
-
+ggplot(data=city_statistics_lead_5y, 
+       aes(x=City, y=Percentage, 
+           fill = fill_col)) + 
+  geom_bar(position = 'stack', stat='identity', fill = city_statistics_lead_5y$fill_col, colour="#444444", size = 0.6) +
+  #scale_fill_manual(values = c("#bcbcc3", "#0085A6", "#006780")) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.4),
+        axis.text=element_text(size=14),
+        axis.title=element_text(size=16),
+        legend.position = "none") +
+  xlab("City") + ylab("Percentage published < 5 years")
+ggsave("results_for_paper/City_hist_5y.png", width = 35, height = 18, units = "cm", dpi = 600)
 
 
 
 #other calculations for paper (need to put in appropriate place)
-total_enrollment <- IntoValue_dataset_cities$enrollment %>% sum(na.rm = TRUE)
 
+#number of participants in unpublished trials
+unpublished_trials_5y <- IntoValue_dataset_cities_5y %>% 
+  filter(!has_publication)
+unpublished_trials_5y_num <- dim(unpublished_trials_5y)[1]
+enrollment_unpublished <- unpublished_trials_5y$enrollment %>% sum(na.rm = TRUE)
+
+
+#calculate how many summary results are published within 24 months
 CTgov_trials <- IntoValue_dataset_cities %>% 
   filter(is_CTgov)
-
+CTgov_trial_num <- dim(CTgov_trials)[1]
+summary_result_num <- sum(CTgov_trials$days_to_summary < 2*365, na.rm = TRUE)
+perc_summary <- summary_result_num/CTgov_trial_num
 
 
 #--------------------------------------------------------------------------------------------------
@@ -264,21 +305,6 @@ ggplot(data=city_statistics_comp,
   ylim(c(0,100))
 ggsave("results_for_paper/City_changes.svg", width = 35, height = 18, units = "cm", dpi = 600)
 
-
-
-
-
-ggplot(data=city_statistics_comp_diffplot, 
-       aes(x=City, y=perc, 
-           fill = bar_type)) + 
-  geom_bar(position = 'stack', stat='identity', fill = city_statistics_comp_diffplot$fill_col, colour="#444444", size = 0.6) +
-  #scale_fill_manual(values = c("#bcbcc3", "#0085A6", "#006780")) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.4),
-        axis.text=element_text(size=14),
-        axis.title=element_text(size=16),
-        legend.position = "none") +
-  xlab("City") + ylab("Percentage published < 24 months")
-ggsave("results_for_paper/City_changes_2.png", width = 35, height = 18, units = "cm", dpi = 300)
 
 
 
