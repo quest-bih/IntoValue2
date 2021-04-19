@@ -1,0 +1,44 @@
+category,Trials,Percentage
+,1658,100
+Behavioral,138,8.3
+Biological,45,2.7
+Combination Product,1,0.1
+Device,276,16.6
+Diagnostic Test,1,0.1
+Dietary Supplement,45,2.7
+Drug,402,24.2
+Genetic,2,0.1
+Other,159,9.6
+Procedure,134,8.1
+Radiation,24,1.4
+NA,431,26
+Industry,224,13.5
+Other,1434,86.5
+I,83,5
+I-II,50,3
+II,234,14.1
+II-III,26,1.6
+III,136,8.2
+IV,112,6.8
+Not given,1017,61.3
+Multicentric,565,34.1
+Monocentric,1093,65.9
+1 - 100,1120,67.6
+100 - 500,435,26.2
+> 500,100,6
+Not given,3,0.2
+before trial start,863,52.1
+after trial start,793,47.8
+21 days after trial start,673,40.6
+60 days after trial start,580,35
+after trial completion,205,12.4
+after publication,25,1.5
+start date not given,2,0.1
+2014,378,22.8
+2015,441,26.6
+2016,409,24.7
+2017,430,25.9
+Completed,1285,77.5
+Terminated,122,7.4
+Suspended,4,0.2
+Unknown status,225,13.6
