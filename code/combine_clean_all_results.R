@@ -118,7 +118,10 @@ DRKS_results_combined <- rbind(DRKS_DC_changes_join, DRKS_results_join) %>%
 intovalue2_results <- rbind(CTgov_results_combined, DRKS_results_combined) 
 
 #remove publication date for all cases that are not counted as publication
-intovalue2_results[intovalue2_results$indentification_step == 8,]$publication_date <- NA
+intovalue2_results[intovalue2_results$indentification_step %in% c(0, 8),]$publication_date <- NA
+intovalue2_results[intovalue2_results$indentification_step %in% c(0, 8),]$publication_DOI <- NA
+intovalue2_results[intovalue2_results$indentification_step %in% c(0, 8),]$publication_URL <- NA
+
 
 intovalue2_results <- intovalue2_results %>%
   rename("has_summary_results" = "were_results_reported",
@@ -141,15 +144,7 @@ intovalue2_results <- intovalue2_results %>%
 
 
 
-
-
 #additional checks
-
-#remove URL, DOI & date for all publ with has_publication = FALSE
-intovalue2_results[intovalue2_results$indentification_step == 0,]$publication_DOI <- NA
-intovalue2_results[intovalue2_results$indentification_step == 0,]$publication_URL <- NA
-intovalue2_results[intovalue2_results$indentification_step == 0,]$publication_date <- NA
-
 assert_that(any(intovalue2_results$has_publication & 
                   (is.na(intovalue2_results$publication_DOI) & 
                      is.na(intovalue2_results$publication_URL))) == FALSE)
@@ -157,6 +152,10 @@ missing_DOI_URL <- intovalue2_results[intovalue2_results$has_publication &
   (is.na(intovalue2_results$publication_DOI) & 
   is.na(intovalue2_results$publication_URL)),]
 
+assert_that(!any(intovalue2_results$has_publication & 
+                   is.na(intovalue2_results$publication_date)))
+missing_publ_date <- intovalue2_results[intovalue2_results$has_publication & 
+                                          is.na(intovalue2_results$publication_date),]
 
 
 write_csv(intovalue2_results, "manual_check/final_results/IntoValue2_Dataset.csv")

@@ -122,7 +122,8 @@ IntoValue_dataset_cities <- IntoValue_dataset %>%
 
 #still has to solve this issue (after updating the unclear cases)
 assert_that(sum(!is.na(IntoValue_dataset_cities$days_to_publ)) ==
-              sum(!is.na(IntoValue_dataset_cities$has_publication)))
+              sum(IntoValue_dataset_cities$has_publication == TRUE | 
+                    IntoValue_dataset_cities$has_summary_results == TRUE))
 
 IntoValue_dataset_cities$lead_cities <- IntoValue_dataset_cities$lead_cities %>% 
   str_replace_all("Charite", "Berlin")
