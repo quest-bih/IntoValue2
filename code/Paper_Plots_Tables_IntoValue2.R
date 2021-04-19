@@ -118,12 +118,13 @@ write_csv(demo_table_save, "results_for_paper/demographics_table.csv")
 
 IntoValue_dataset_cities <- IntoValue_dataset %>%
   mutate(days_to_publ = pmin(days_to_publication,   #get minimum of days to pub or to summary result
-                             days_to_summary, na.rm = TRUE))
+                             days_to_summary, na.rm = TRUE)) %>%
+  mutate(has_publ_or_summary = IntoValue_dataset_cities$has_publication |
+         IntoValue_dataset_cities$has_summary_results)
 
 #still has to solve this issue (after updating the unclear cases)
 assert_that(sum(!is.na(IntoValue_dataset_cities$days_to_publ)) ==
-              sum(IntoValue_dataset_cities$has_publication == TRUE | 
-                    IntoValue_dataset_cities$has_summary_results == TRUE))
+              sum(IntoValue_dataset_cities$has_publ_or_summary  == TRUE))
 
 IntoValue_dataset_cities$lead_cities <- IntoValue_dataset_cities$lead_cities %>% 
   str_replace_all("Charite", "Berlin")
@@ -137,12 +138,6 @@ cities <- IntoValue_dataset_cities$lead_cities %>%
   unlist() %>% 
   unique() %>% 
   sort()
-
-total_enrollment <- IntoValue_dataset_cities$enrollment %>% sum(na.rm = TRUE)
-
-CTgov_trials <- IntoValue_dataset_cities %>% 
-  filter(is_CTgov)
-
 
 #for given city calculates number of trials, published trials within 24 month after CD,
 #and publication percentage
@@ -194,6 +189,17 @@ write_csv(city_statistics_lead_5y, "results_for_paper/city_statistics_5years.csv
 
 unpublished_trials_5y <- IntoValue_dataset_cities_5y %>% 
   filter(!has_publication)
+
+
+
+
+
+#other calculations for paper (need to put in appropriate place)
+total_enrollment <- IntoValue_dataset_cities$enrollment %>% sum(na.rm = TRUE)
+
+CTgov_trials <- IntoValue_dataset_cities %>% 
+  filter(is_CTgov)
+
 
 
 #--------------------------------------------------------------------------------------------------
