@@ -127,7 +127,9 @@ assert_that(sum(!is.na(IntoValue_dataset_cities$days_to_publ)) ==
               sum(IntoValue_dataset_cities$has_publ_or_summary  == TRUE))
 
 IntoValue_dataset_cities$lead_cities <- IntoValue_dataset_cities$lead_cities %>% 
-  str_replace_all("Charite", "Berlin")
+  str_replace_all("Charite", "Berlin") %>%
+  str_replace_all("TU", "TU-München") %>%
+  str_replace_all("LMU", "LMU-München")
 
 IntoValue_dataset_cities$lead_cities <- paste("All", IntoValue_dataset_cities$lead_cities)
 
@@ -182,6 +184,7 @@ ggplot(data=city_statistics_lead,
         axis.text=element_text(size=14),
         axis.title=element_text(size=16),
         legend.position = "none") +
+  ylim(0, 100) +
   xlab("City") + ylab("Percentage published < 2 years")
 ggsave("results_for_paper/City_hist_2y.png", width = 35, height = 18, units = "cm", dpi = 600)
 
@@ -221,6 +224,7 @@ ggplot(data=city_statistics_lead_5y,
         axis.text=element_text(size=14),
         axis.title=element_text(size=16),
         legend.position = "none") +
+  ylim(0, 100) +
   xlab("City") + ylab("Percentage published < 5 years")
 ggsave("results_for_paper/City_hist_5y.png", width = 35, height = 18, units = "cm", dpi = 600)
 
