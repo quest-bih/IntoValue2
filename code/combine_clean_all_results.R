@@ -1,5 +1,6 @@
 library(tidyverse)
 library(lubridate)
+library(assertthat)
 
 #----------------------------------------------------------------------------------------------------------------------
 # Loading of AACT dataset for additional variables
@@ -137,6 +138,25 @@ intovalue2_results <- intovalue2_results %>%
 #filter out studies that are not part of the trial, as no UMC was affiliated with them
 intovalue2_results <- intovalue2_results %>%
   filter(indentification_step != 9)
+
+
+
+
+
+#additional checks
+
+#remove URL, DOI & date for all publ with has_publication = FALSE
+intovalue2_results[intovalue2_results$indentification_step == 0,]$publication_DOI <- NA
+intovalue2_results[intovalue2_results$indentification_step == 0,]$publication_URL <- NA
+intovalue2_results[intovalue2_results$indentification_step == 0,]$publication_date <- NA
+
+assert_that(any(intovalue2_results$has_publication & 
+                  (is.na(intovalue2_results$publication_DOI) & 
+                     is.na(intovalue2_results$publication_URL))) == FALSE)
+missing_DOI_URL <- intovalue2_results[intovalue2_results$has_publication & 
+  (is.na(intovalue2_results$publication_DOI) & 
+  is.na(intovalue2_results$publication_URL)),]
+
 
 
 write_csv(intovalue2_results, "manual_check/final_results/IntoValue2_Dataset.csv")
