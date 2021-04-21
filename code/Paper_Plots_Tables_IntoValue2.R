@@ -112,6 +112,7 @@ demo_table_save <- tibble(category = rownames(demo_table_save),
        Percentage = demo_table_save[,2] %>% round(2)) 
 write_csv(demo_table_save, "results_for_paper/demographics_table.csv")
 
+
 #--------------------------------------------------------------------------------------------------
 # cities results table
 #--------------------------------------------------------------------------------------------------
@@ -119,8 +120,8 @@ write_csv(demo_table_save, "results_for_paper/demographics_table.csv")
 IntoValue_dataset_cities <- IntoValue_dataset %>%
   mutate(days_to_publ = pmin(days_to_publication,   #get minimum of days to pub or to summary result
                              days_to_summary, na.rm = TRUE)) %>%
-  mutate(has_publ_or_summary = IntoValue_dataset_cities$has_publication |
-         IntoValue_dataset_cities$has_summary_results)
+  mutate(has_publ_or_summary = IntoValue_dataset$has_publication |
+           IntoValue_dataset$has_summary_results)
 
 #still has to solve this issue (after updating the unclear cases)
 assert_that(sum(!is.na(IntoValue_dataset_cities$days_to_publ)) ==
