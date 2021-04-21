@@ -269,7 +269,9 @@ IntoValue1_dataset <- IntoValue1_dataset[has_long_followup,]
 #combine old and new dataset into one table
 IntoValue1_dataset$lead_cities <- IntoValue1_dataset$lead_cities %>% 
   str_replace_all("Lübeck", "Schleswig-Holstein") %>%
-  str_replace_all("Kiel", "Schleswig-Holstein")
+  str_replace_all("Kiel", "Schleswig-Holstein") %>%
+  str_replace_all("TU", "TU-München") %>%
+  str_replace_all("LMU", "LMU-München")
 
 IntoValue1_dataset$lead_cities <- paste("All", IntoValue1_dataset$lead_cities)
 
