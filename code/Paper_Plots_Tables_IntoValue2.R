@@ -15,8 +15,8 @@ library(lubridate)
 library(assertthat)
 
 #read in dataset
-IntoValue_dataset <- read_csv("manual_check/final_results/IntoValue2_Dataset.csv", na = "NA")
-IntoValue1_dataset <- read_csv("code/IntoValue1_Dataset.csv", na = "NA")
+IntoValue_dataset <- read_csv("data/IntoValue2_Dataset.csv", na = "NA")
+IntoValue1_dataset <- read_csv("data/IntoValue1_Dataset.csv", na = "NA")
 
 
 #--------------------------------------------------------------------------------------------------

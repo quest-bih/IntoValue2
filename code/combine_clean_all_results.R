@@ -158,4 +158,4 @@ missing_publ_date <- intovalue2_results[intovalue2_results$has_publication &
                                           is.na(intovalue2_results$publication_date),]
 
 
-write_csv(intovalue2_results, "manual_check/final_results/IntoValue2_Dataset.csv")
+write_csv(intovalue2_results, "data/IntoValue2_Dataset.csv")
