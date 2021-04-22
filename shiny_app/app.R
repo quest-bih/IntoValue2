@@ -14,8 +14,7 @@ library(KMsurv) #for Kaplan-Meier curve
 source("app_functions.R", encoding = "UTF-8")
 
 #read in .rds output from Journal_Whitelist_script.R here
-IntoValue_app_table_old <- readRDS("data/CT_gov_2.rds")
-IntoValue_app_table <- read_csv("data/IntoValue_Dataset_combined.csv")
+IntoValue_app_table <- readRDS("data/IntoValue_Dataset_combined.rds")
 delayed_registration_table <- readRDS("data/CT_gov_delayed_registration_3.rds")
 
 #rename Duisburg to Duisburg-Essen
@@ -84,7 +83,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                                 selectInput('phase', 'Trial phase', c("Any", "I", "I-II", "II", "II-III", "III", "IV", "Not given")),
                                                 selectInput('intervention', 'Type of intervention', c("Any", "Drug", "Device", "Other")),
                                                 selectInput('participants', 'Number of participants', c("Any", "<100", "100-500", ">500", "Not given")),
-                                                selectInput('complyear', 'Completion year', c("Any", "2009", "2010", "2011", "2012", "2013", ">2013")),
+                                                selectInput('complyear', 'Completion year', c("Any", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017")),
                                                 helpText('There are many choices on which group of clinical trials to consider. All of these choices
                                           alter the results for the final publication rates. Only the trials in our dataset that match the set filter criteria
                                                            are considered for the calculation of the timely reporting percentage.')
@@ -207,7 +206,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                      selectInput('tab_phase', 'Trial phase', c("Any", "I", "I-II", "II", "II-III", "III", "IV", "Not given")),
                                      selectInput('tab_intervention', 'Type of intervention', c("Any", "Drug", "Device", "Other")),
                                      selectInput('tab_participants', 'Number of participants', c("Any", "<100", "100-500", ">500", "Not given")),
-                                     selectInput('tab_complyear', 'Completion year', c("Any", "2009", "2010", "2011", "2012", "2013", ">2013")),
+                                     selectInput('tab_complyear', 'Completion year', c("Any", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017")),
                                      helpText('There are many choices on which group of clinical trials to consider. All of these choices
                                         alter the results for the final publication rates. Only the trials in our dataset that match the set filter criteria
                                                            are considered for the calculation of the timely reporting percentage.')

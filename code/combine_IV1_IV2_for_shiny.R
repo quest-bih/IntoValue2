@@ -6,12 +6,11 @@ IntoValue1_dataset <- readRDS("shiny_app/data/CT_gov_2.rds")
 
 
 #unify variables 
-
 id_step_name <- function(id_step_num)
 {
   step_name = NA
   if(id_step_num == 0) {
-    step_name = "No Publ"
+    step_name = "No publ"
   } else if(id_step_num == 1) {
     step_name = "Registry linked"
   } else if(id_step_num == 2) {
@@ -19,7 +18,7 @@ id_step_name <- function(id_step_num)
   } else if(id_step_num == 3) {
     step_name = "Hand search"
   } else if(id_step_num == 8) {
-    step_name = "No Publ"
+    step_name = "No publ"
   }
   
   return(step_name)
@@ -34,7 +33,8 @@ IntoValue_dataset <- IntoValue_dataset %>%
          days_CD_to_reg = days_reg_to_compl,
          days_start_to_reg = days_reg_to_start,
          days_publ_to_reg = days_reg_to_publ) %>%
-  mutate(lead_or_facility = "lead",
+  mutate(is_CTgov = is_CTgov %>% map_chr(function(x) ifelse(x, "yes", "no")),
+         lead_or_facility = "lead",
          publication_PMID = NA,
          `Days to publication PCD` = NA,
          `Days to summary PCD` = NA,

@@ -95,17 +95,6 @@ set_days_to_publ <- function(summary_type_in, compl_date_in, input_table) {
   return(days_to_pub)
 }
 
-#how many days could we observe the different trials since CD/PCD
-#important for censoring for the Kaplan-Meier curve
-set_days_observed <- function(compl_date_in, input_table) {
-  if(compl_date_in == "Primary completion date (CT.gov only)") {
-    days_observed = dmy("01.12.2017") - input_table$primary_completion_date
-  } else {
-    days_observed = dmy("01.12.2017") - input_table$completion_date
-  }
-
-  return(days_observed)
-}
 
 #for years to publ need to consider 2 things:
 #1) how many years since CD/PCD do we consider as timely publication
@@ -132,16 +121,24 @@ set_years_to_publ <- function(month_to_publ) {
 
 filter_followup_time <- function(input_table, followup_time, compl_date_in) {
 
+  # we finished the publication search beginning of Dec. 2017 for IV1
+  # and at beginning of Dec. 2020 for IV2
+  # and take this as cutoff date for the timeframe
+  cutoff_date_IV1 <- dmy("01.12.2017") - months(followup_time)
+  cutoff_date_IV2 <- dmy("01.12.2020") - months(followup_time)
+  
   if(compl_date_in == "Primary completion date (CT.gov only)") {
     compl_col <- "primary_completion_date"
   } else {
     compl_col <- "completion_date"
   }
 
-  #we finished the publication search beginning of Dec. 2017
-  #and take this as cutoff date for the timeframe
-  cutoff_date <- dmy("01.12.2017") - months(followup_time)
-  has_long_followup <- input_table[[compl_col]] < cutoff_date
+  has_long_followup_IV1 <- (input_table[[compl_col]] < cutoff_date_IV1)
+  has_long_followup_IV2 <- (input_table[[compl_col]] < cutoff_date_IV2)
+  is_IV1 <- input_table[["IV_version"]] == "IV1"
+  is_IV2 <- input_table[["IV_version"]] == "IV2"
+  
+  has_long_followup <- (has_long_followup_IV1 & is_IV1) | (has_long_followup_IV2 & is_IV2)
 
   return(input_table[has_long_followup,])
 }
@@ -150,7 +147,7 @@ filter_followup_time <- function(input_table, followup_time, compl_date_in) {
 set_publ_type <- function(publ_type_in) {
   #first select which publications are counted
   if(publ_type_in == "Full search (incl. Google Scholar + Web of Science)") {
-    publ_type = c("Registry linked", "Pubmed", "Hand search", "Dissertation")
+    publ_type = c("Registry linked", "Pubmed", "Hand search", "Dissertation", "Google ID search")
   } else if(publ_type_in == "Registry + Pubmed") {
     publ_type = c("Registry linked", "Pubmed")
   } else {
@@ -284,14 +281,14 @@ set_industry_status <- function(industry_in) {
 set_phase_status <- function(phase_sub_in) {
   if(phase_sub_in == "Any") {
     phase_sub <- c("Early Phase 1", "I", "Phase 1", "I-II", "Phase 1/Phase 2",
-                   "II", "IIb", "Phase 2", "II-III", "Phase 2/Phase 3",
-                   "III", "IIIb", "Phase 3", "IV", "Phase 4", "N/A", "NA")
+                   "II", "IIa", "IIb", "Phase 2", "II-III", "Phase 2/Phase 3",
+                   "III", "IIIb", "Phase 3", "IV", "Phase 4", "N/A", "NA", "[---]*")
   } else if(phase_sub_in == "I") {
     phase_sub <- c("Early Phase 1", "I", "Phase 1")
   } else if(phase_sub_in == "I-II") {
     phase_sub <- c("I-II", "Phase 1/Phase 2")
   } else if(phase_sub_in == "II") {
-    phase_sub <- c("II", "IIb", "Phase 2")
+    phase_sub <- c("II", "IIa", "IIb", "Phase 2")
   } else if(phase_sub_in == "II-III") {
     phase_sub <- c("II-III", "Phase 2/Phase 3")
   } else if(phase_sub_in == "III") {
@@ -324,14 +321,16 @@ set_reg_time <- function(reg_time_in, input_table) {
 
 set_intervention_status <- function(intervention_in) {
   if(intervention_in == "Any") {
-    intervention <- c("Behavioral", "Biological", "Dietary Supplement", "Genetic", "Not given",
+    intervention <- c("Behavioral", "Biological", "Combination Product", "Diagnostic Test",
+                      "Dietary Supplement", "Genetic", "Not given",
                       "Other", "Procedure", "Radiation", "Drug", "Device")
   } else if(intervention_in == "Drug") {
     intervention <- c("Drug")
   } else if(intervention_in == "Device") {
     intervention <- c("Device")
   } else {
-    intervention <- c("Behavioral", "Biological", "Dietary Supplement", "Genetic", "Not given",
+    intervention <- c("Behavioral", "Biological", "Combination Product", "Diagnostic Test",
+                      "Dietary Supplement", "Genetic", "Not given",
                       "Other", "Procedure", "Radiation")
   }
 
@@ -373,8 +372,6 @@ filter_participants <- function(input_table, interval) {
 set_complyear_status <- function(complyear_in) {
   if(complyear_in == "Any") {
     complyear <- c("2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018")
-  } else if(complyear_in == ">2013") {
-    complyear <- c("2014", "2015", "2016", "2017", "2018")
   } else {
     complyear <- complyear_in
   }
