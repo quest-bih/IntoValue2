@@ -43,7 +43,9 @@ IntoValue_dataset <- IntoValue_dataset %>%
          primary_completion_year = NA)
 
 IntoValue_dataset$`Publication type` = IntoValue_dataset$indentification_step %>% map_chr(id_step_name)
-  
+IntoValue_dataset$intervention_type <- IntoValue_dataset$intervention_type %>% replace_na("Not given")
+
+
 #remove additional IV2 rows for now  
 IntoValue_dataset <- IntoValue_dataset %>% 
   select(-indentification_step, -study_first_submitted_date,

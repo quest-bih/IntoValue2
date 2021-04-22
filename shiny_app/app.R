@@ -256,7 +256,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                    ),
                                    wellPanel(
                                      h4("Stratifying variable"),
-                                     selectInput('cumDistCat', 'Category', c("Primary completion year", "Lead sponsor Industry vs. Academic",
+                                     selectInput('cumDistCat', 'Category', c("Completion year", "Lead sponsor Industry vs. Academic",
                                                                              "Mono- vs. Multicentric", "Intervention types (CT.gov only)",
                                                                              "Number of participants")),
                                      helpText('Changes the stratifying variable for the Kaplan-Meier plot.')
@@ -313,6 +313,7 @@ server <- function(input, output) {
 
   vis %>% bind_shiny("plot1")
 
+  
   #--------------------------------------------------------------------------------------------------
   # Code for plotting delayed registration for the extended CT.gov dataset
   #--------------------------------------------------------------------------------------------------
@@ -387,14 +388,18 @@ server <- function(input, output) {
 
     cum_cat <- input$cumDistCat
 
-    if(cum_cat == "Primary completion year") {
-      compl_years <- IntoValue_KM_data$primary_completion_date %>% str_sub(1, 4)
+    if(cum_cat == "Completion year") {
+      compl_years <- IntoValue_KM_data$completion_date %>% str_sub(1, 4)
       subsets_cum_plot <- list("Total" = rep(TRUE, dim(IntoValue_KM_data)[1]),
                                "2009" = compl_years == "2009",
                                "2010" = compl_years == "2010",
                                "2011" = compl_years == "2011",
                                "2012" = compl_years == "2012",
-                               "2013" = compl_years == "2013")
+                               "2013" = compl_years == "2013",
+                               "2014" = compl_years == "2014",
+                               "2015" = compl_years == "2015",
+                               "2016" = compl_years == "2016",
+                               "2017" = compl_years == "2017")
     } else if(cum_cat == "Lead sponsor Industry vs. Academic") {
       subsets_cum_plot <- list("Total" = rep(TRUE, dim(IntoValue_KM_data)[1]),
                                "Industry" = IntoValue_KM_data$main_sponsor == "Industry",

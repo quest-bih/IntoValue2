@@ -96,6 +96,25 @@ set_days_to_publ <- function(summary_type_in, compl_date_in, input_table) {
 }
 
 
+#how many days could we observe the different trials since CD/PCD 
+#important for censoring for the Kaplan-Meier curve 
+set_days_observed <- function(compl_date_in, input_table) { 
+  
+  #make vector with the cutoff dates for each trial
+  cutoff_vec <- rep(dmy("01.12.2017"), dim(input_table)[1])
+  cutoff_vec[input_table$IV_version == "IV2"] <- dmy("01.12.2020")
+  
+  
+  if(compl_date_in == "Primary completion date (CT.gov only)") { 
+    days_observed = cutoff_vec - input_table$primary_completion_date 
+  } else { 
+    days_observed = cutoff_vec - input_table$completion_date 
+  } 
+  
+  return(days_observed) 
+} 
+
+
 #for years to publ need to consider 2 things:
 #1) how many years since CD/PCD do we consider as timely publication
 #2) how long could we at least follow up a study
@@ -468,7 +487,7 @@ make_table_data <- function(input_table, summary_type_in, compl_status_in, spons
   } else {
     #add those publ to the publ count column
     input_table[["publ"]] <- input_table[["Publication type"]] %in% publ_type
-    input_table[["publ"]] <- input_table[["publ"]] & days_to_pub < (365 * years_until_publ)
+    input_table[["publ"]] <- input_table[["publ"]] & (days_to_pub < (365 * years_until_publ))
 
     input_table[["publ"]][is.na(input_table[["publ"]])] <- FALSE
   }
