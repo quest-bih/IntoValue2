@@ -71,6 +71,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                               ),
                                               wellPanel(
                                                 h4("Different subgroups"),
+                                                selectInput('version', 'Study version', c("Any", "IntoValue1", "IntoValue2")),
                                                 selectInput('registry', 'Registry', c("CT.gov + DRKS", "CT.gov", "DRKS")),
                                                 selectInput('status', 'Completion status', c("Any status", "Completed", "Terminated", "Unknown status", "Suspended")),
                                                 selectInput('sponsor', 'Responsibility level', c("Lead or Facility", "Lead trials only", "Facility trials only"), selected = "Lead trials only"),
@@ -194,6 +195,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                    ),
                                    wellPanel(
                                      h4("Different subgroups"),
+                                     selectInput('tab_version', 'Study version', c("Any", "IntoValue1", "IntoValue2")),
                                      selectInput('tab_registry', 'Registry', c("CT.gov + DRKS", "CT.gov", "DRKS")),
                                      selectInput('tab_status', 'Completion status', c("Any status", "Completed", "Terminated", "Unknown status", "Suspended")),
                                      selectInput('tab_sponsor', 'Responsibility level', c("Lead or Facility", "Lead trials only", "Facility trials only"), selected = "Lead trials only"),
@@ -288,7 +290,7 @@ server <- function(input, output) {
                                  input$complDate, input$timeframe, input$registered,
                                  input$multicentric, input$industry, input$phase,
                                  input$pubType, input$registry, input$intervention,
-                                 input$participants, input$complyear)
+                                 input$participants, input$complyear, input$version)
 
 
     plot_data %>%
@@ -358,7 +360,7 @@ server <- function(input, output) {
                              input$tab_complDate, input$tab_timeframe, input$tab_registered,
                              input$tab_multicentric, input$tab_industry, input$tab_phase,
                              input$tab_pubType, input$tab_registry, input$tab_intervention,
-                             input$tab_participants, input$tab_complyear),
+                             input$tab_participants, input$tab_complyear, input$tab_version),
                   options = list(
                     pageLength = 37,
                     lengthMenu = list(c(37),

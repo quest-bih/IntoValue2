@@ -398,15 +398,16 @@ set_complyear_status <- function(complyear_in) {
   return(complyear)
 }
 
-set_complyear_status_delay <- function(complyear_in) {
-  if(complyear_in == "Any") {
-    complyear <- c("2006", "2007", "2008", "2009", "2010", "2011", "2012",
-                   "2013", "2014", "2015", "2016", "2017", "2018")
+set_study_version <- function(version_in) {
+  if(version_in == "Any") {
+    version <- c("IV1", "IV2")
+  } else if(version_in == "IntoValue1") {
+    version <- c("IV1")
   } else {
-    complyear <- complyear_in
+    version <- c("IV2")
   }
 
-  return(complyear)
+  return(version)
 }
 
 
@@ -442,7 +443,7 @@ make_basic_city_tab <- function(input_data, delayed = FALSE)
 #uses all the currently choosen input options to filter the dataset accordingly
 make_table_data <- function(input_table, summary_type_in, compl_status_in, sponsor_status_in, compl_date_in,
                             month_to_publ_in, reg_time_in, multicentric_in, industry_in, phase_sub_in,
-                            publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, delayed = FALSE)
+                            publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, version_in, delayed = FALSE)
 {
 
   #set variables for timely publication options
@@ -462,6 +463,7 @@ make_table_data <- function(input_table, summary_type_in, compl_status_in, spons
   intervention <- set_intervention_status(intervention_in)
   participants <- set_participants_status(participants_in)
   complyear <- set_complyear_status(complyear_in)
+  version <- set_study_version(version_in)
 
 
   #one has to be careful with the publication types - depending on which publications I want to measure
@@ -503,7 +505,8 @@ make_table_data <- function(input_table, summary_type_in, compl_status_in, spons
     filter(main_sponsor %in% industry) %>%
     filter(phase %in% phase_sub) %>%
     filter(intervention_type %in% intervention) %>%
-    filter(completion_year %in% complyear)
+    filter(completion_year %in% complyear) %>%
+    filter(IV_version %in% version)
 
   table_cities <- input_table_filtered %>%
     rbind(make_basic_city_tab(input_table)) %>% #add the cities tibble to ensure that all cities are present in the results
@@ -591,12 +594,12 @@ make_table_data_delay <- function(input_table, compl_status_in, multicentric_in,
 #arranges data for display as table
 make_table <- function(input_table, summary_type_in, compl_status_in, sponsor_status_in,
                        compl_date_in, month_to_publ_in, reg_time_in, multicentric_in, industry_in, phase_sub_in,
-                       publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, delayed = FALSE)
+                       publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, version_in, delayed = FALSE)
 {
   #first filter data according to input options
   table_data <- make_table_data(input_table, summary_type_in, compl_status_in, sponsor_status_in,
                                 compl_date_in, month_to_publ_in, reg_time_in, multicentric_in, industry_in, phase_sub_in,
-                                publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, delayed)
+                                publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, version_in, delayed)
 
   table_data <- table_data %>%
     ungroup() %>%
@@ -628,12 +631,12 @@ make_table <- function(input_table, summary_type_in, compl_status_in, sponsor_st
 #arranges data for plotting
 make_plot_data <- function(input_table, summary_type_in, compl_status_in, sponsor_status_in,
                            compl_date_in, month_to_publ_in, reg_time_in, multicentric_in, industry_in, phase_sub_in,
-                           publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in)
+                           publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, version_in)
 {
   #first filter data according to input options
   plot_data <- make_table_data(input_table, summary_type_in, compl_status_in, sponsor_status_in,
                                compl_date_in, month_to_publ_in, reg_time_in, multicentric_in, industry_in, phase_sub_in,
-                               publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in)
+                               publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, version_in)
 
   #modifications specific for plotting
   plot_data$city <- factor(plot_data$city, levels = plot_data$city)
