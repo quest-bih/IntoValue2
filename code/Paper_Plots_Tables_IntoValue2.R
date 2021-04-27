@@ -120,8 +120,7 @@ write_csv(demo_table_save, "results_for_paper/demographics_table.csv")
 IntoValue_dataset_cities <- IntoValue_dataset %>%
   mutate(days_to_publ = pmin(days_to_publication,   #get minimum of days to pub or to summary result
                              days_to_summary, na.rm = TRUE)) %>%
-  mutate(has_publ_or_summary = IntoValue_dataset$has_publication |
-           IntoValue_dataset$has_summary_results)
+  mutate(has_publ_or_summary = has_publication | has_summary_results)
 
 #still has to solve this issue (after updating the unclear cases)
 assert_that(sum(!is.na(IntoValue_dataset_cities$days_to_publ)) ==
@@ -147,12 +146,12 @@ cities <- IntoValue_dataset_cities$lead_cities %>%
 get_city_statistics <- function(city, city_assignments, days_to_publ, years=2)
 {
   city_tot <- sum(str_detect(city_assignments, city), na.rm = TRUE)
-  city_publ_24m_CD <- sum(str_detect(city_assignments, city) &
+  city_publ_years_after_CD <- sum(str_detect(city_assignments, city) &
                             days_to_publ < years*365, na.rm = TRUE)
-  city_perc <- round(city_publ_24m_CD/city_tot, 3) * 100
+  city_perc <- round(city_publ_years_after_CD/city_tot, 3) * 100
 
   city_stat <- tibble("City" = city, "Trials" = city_tot,
-                      !!(paste0("Published <", years * 12, "m after CD")) := city_publ_24m_CD,
+                      !!(paste0("Published <", years * 12, "m after CD")) := city_publ_years_after_CD,
                       "Percentage" = city_perc)
 
   return(city_stat)
@@ -196,12 +195,14 @@ ggsave("results_for_paper/City_hist_2y.png", width = 35, height = 18, units = "c
 #and take this as cutoff date for the timeframe 
 # THE DATE STILL HAS TO BE DISCUSSED IN THE GROUP!!!
 cutoff_date <- dmy("01.12.2020") - months(60)
-IntoValue_dataset_cities_5y <- IntoValue_dataset_cities %>% filter(completion_date < cutoff_date)
+IntoValue_dataset_cities_5y <- IntoValue_dataset_cities %>% 
+  filter(completion_date < cutoff_date) %>%
+  mutate(has_publ_within_5y = has_publication & days_to_publ < 5*365)
 
 city_statistics_lead_5y <- map(cities, get_city_statistics,
                             city_assignments = IntoValue_dataset_cities_5y$lead_cities,
                             days_to_publ = IntoValue_dataset_cities_5y$days_to_publ,
-                            years = 50) #for this subgroup we do not stop counting publications after 5 years, but allow any duration
+                            years = 5) 
 city_statistics_lead_5y <- do.call(rbind, city_statistics_lead_5y)
 
 print(city_statistics_lead_5y, n = Inf)
@@ -233,9 +234,9 @@ ggsave("results_for_paper/City_hist_5y.png", width = 35, height = 18, units = "c
 
 #other calculations for paper (need to put in appropriate place)
 
-#number of participants in unpublished trials
+#number of participants in trials that did not publish results within 5 years
 unpublished_trials_5y <- IntoValue_dataset_cities_5y %>% 
-  filter(!has_publication)
+  filter(!has_publ_within_5y)
 unpublished_trials_5y_num <- dim(unpublished_trials_5y)[1]
 enrollment_unpublished <- unpublished_trials_5y$enrollment %>% sum(na.rm = TRUE)
 
