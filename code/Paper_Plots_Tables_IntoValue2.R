@@ -377,7 +377,7 @@ ggplot(cum_dist_years, aes(x = months, y = fraction, color = category)) +
   geom_step(size = 1) + #, color = "#C02942") +
   theme_minimal() +
   xlab("Months") + ylab("Unpublished studies (%)") +
-  scale_color_brewer(name = "Primary\nCompletion\nYear" , palette = 'Dark2') +
+  scale_color_brewer(name = "Completion\nYear" , palette = 'Dark2') +
   theme(text = element_text(size=16),
         axis.text.x = element_text(size=16),
         axis.text.y = element_text(size=16)) +
