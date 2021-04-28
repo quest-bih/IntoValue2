@@ -1,9 +1,48 @@
 library(tidyverse)
+library(lubridate)
 
 #read in dataset
 IntoValue_dataset <- read_csv("data/IntoValue2_Dataset.csv", na = "NA")
 IntoValue1_dataset <- readRDS("shiny_app/data/CT_gov_2.rds")
 
+#----------------------------------------------------------------------------------------------------------------------
+# Loading of AACT dataset
+#----------------------------------------------------------------------------------------------------------------------
+
+#the AACT dataset has to be downloaded first from https://aact.ctti-clinicaltrials.org/pipe_files
+AACT_folder <- "C:/Datenablage/AACT/AACT dataset 20200603/" #insert the AACT download folder here
+
+#AACT filenames that we need to load
+AACT_dataset_names <- c("studies", "overall_officials", "sponsors", "responsible_parties",
+                        "facilities", "interventions", "calculated_values")
+
+AACT_dataset_files <- paste0(AACT_folder, AACT_dataset_names, ".txt")
+AACT_datasets <- AACT_dataset_files %>%
+  map(read_delim, delim = "|")
+names(AACT_datasets) <- AACT_dataset_names
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# add the missing primary completion date to the IV2 dataset
+#----------------------------------------------------------------------------------------------------------------------
+
+PCD_join <- AACT_datasets$studies %>% 
+  select(nct_id, primary_completion_date, study_first_submitted_date) %>% 
+  rename(id = nct_id)
+
+IntoValue_dataset <- read_csv("data/IntoValue2_Dataset.csv", na = "NA")
+IntoValue_dataset <- IntoValue_dataset %>% 
+  left_join(PCD_join) %>%
+  mutate(primary_completion_year = primary_completion_date %>% str_sub(1,4),
+         primary_completion_date = primary_completion_date %>% ymd(),
+         study_first_submitted_date = study_first_submitted_date %>% ymd(),
+         `Days to summary PCD` = summary_res_date - primary_completion_date,
+         `Days to publication PCD` = publication_date - primary_completion_date,
+         days_PCD_to_reg = primary_completion_date - study_first_submitted_date)
+
+#----------------------------------------------------------------------------------------------------------------------
+# rename and modify IV2 variables to match the IV1 dataset format
+#----------------------------------------------------------------------------------------------------------------------
 
 #unify variables 
 id_step_name <- function(id_step_num)
@@ -35,12 +74,7 @@ IntoValue_dataset <- IntoValue_dataset %>%
          days_publ_to_reg = days_reg_to_publ) %>%
   mutate(is_CTgov = is_CTgov %>% map_chr(function(x) ifelse(x, "yes", "no")),
          lead_or_facility = "lead",
-         publication_PMID = NA,
-         `Days to publication PCD` = NA,
-         `Days to summary PCD` = NA,
-         days_PCD_to_reg = NA,
-         primary_completion_date = NA,
-         primary_completion_year = NA)
+         publication_PMID = NA)
 
 IntoValue_dataset$`Publication type` = IntoValue_dataset$indentification_step %>% map_chr(id_step_name)
 IntoValue_dataset$intervention_type <- IntoValue_dataset$intervention_type %>% replace_na("Not given")
@@ -75,7 +109,7 @@ IntoValue_dataset_trials_per_city <- IntoValue_dataset_trials_per_city %>%
   rbind(IntoValue_dataset_all_trials) %>%
   select(-lead_cities)
 
-
+#check for remaning differences in variable names
 common_variables <- colnames(IntoValue_dataset_trials_per_city)[(colnames(IntoValue_dataset_trials_per_city) %in% colnames(IntoValue1_dataset))]
 variables_only_IV2 <- colnames(IntoValue_dataset_trials_per_city)[!(colnames(IntoValue_dataset_trials_per_city) %in% colnames(IntoValue1_dataset))]
 variables_only_IV1 <- colnames(IntoValue1_dataset)[!(colnames(IntoValue1_dataset) %in% colnames(IntoValue_dataset_trials_per_city))]
@@ -97,6 +131,7 @@ IntoValue1_dataset$city[IntoValue1_dataset$city == "Lübeck"] <- "Schleswig-Hols
 IntoValue1_dataset <- IntoValue1_dataset %>% distinct(id, city, .keep_all = TRUE)
 
 
+#check for remaning differences in city names
 IV1_cities <- IntoValue1_dataset$city %>% unique() %>% sort()
 IV2_cities <- IntoValue_dataset_trials_per_city$city %>% unique() %>% sort()
 cities_only_IV1 <- IV1_cities[!(IV1_cities %in% IV2_cities)]
@@ -116,7 +151,8 @@ IntoValue1_dataset_dedupl <- IntoValue1_dataset_dedupl %>%
 IntoValue_dataset_trials_per_city <- IntoValue_dataset_trials_per_city %>% 
   mutate(IV_version = "IV2")
 
-IntoValue_dataset_comb <- rbind(IntoValue_dataset_trials_per_city, IntoValue1_dataset_dedupl)
+IntoValue_dataset_comb <- rbind(IntoValue_dataset_trials_per_city, IntoValue1_dataset_dedupl)  %>%
+  mutate(completion_year = str_sub(completion_date, 1, 4))
 
 
 write_rds(IntoValue_dataset_comb, "shiny_app/data/IntoValue_Dataset_combined.rds")

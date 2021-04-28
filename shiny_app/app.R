@@ -21,10 +21,6 @@ delayed_registration_table <- readRDS("data/CT_gov_delayed_registration_3.rds")
 IntoValue_app_table$city <- IntoValue_app_table$city %>% str_replace("Duisburg", "Duisburg-Essen")
 delayed_registration_table$city <- delayed_registration_table$city %>% str_replace("Duisburg", "Duisburg-Essen")
 
-IntoValue_app_table <- IntoValue_app_table %>%
-  mutate(completion_year = str_sub(completion_date, 1, 4))
-#delayed_registration_table <- delayed_registration_table %>%
-#  mutate(completion_year = str_sub(completion_date, 1, 4))
 
 IntoValue_studies_only <- IntoValue_app_table %>%
   filter(city == "All trials combined")
