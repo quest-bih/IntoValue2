@@ -434,10 +434,14 @@ server <- function(input, output) {
 
     #delete last datapoints for the later years, as we couldn't follow up the trials
     #for more than 48 month for 2013 and 60 month for 2012
-    if(cum_cat == "Primary completion year") {
+    #or 36 - 60 month for 2017-2015, respectively
+    if(cum_cat == "Completion year") {
       cum_dist_years <- cum_dist_years %>%
         filter(!(category == "2013" & months > 48)) %>%
-        filter(!(category == "2012" & months > 60))
+        filter(!(category == "2012" & months > 60)) %>%
+        filter(!(category == "2017" & months > 36)) %>%
+        filter(!(category == "2016" & months > 48)) %>%
+        filter(!(category == "2015" & months > 60))
     }
 
     #cum_dist_years$tooltip = as.character(paste0("<b>", cum_dist_years$category, "</b><br>",
