@@ -40,6 +40,7 @@ IntoValue_dataset <- IntoValue_dataset %>%
          `Days to publication PCD` = publication_date - primary_completion_date,
          days_PCD_to_reg = primary_completion_date - study_first_submitted_date)
 
+
 #----------------------------------------------------------------------------------------------------------------------
 # rename and modify IV2 variables to match the IV1 dataset format
 #----------------------------------------------------------------------------------------------------------------------
@@ -79,13 +80,16 @@ IntoValue_dataset <- IntoValue_dataset %>%
 IntoValue_dataset$`Publication type` = IntoValue_dataset$indentification_step %>% map_chr(id_step_name)
 IntoValue_dataset$intervention_type <- IntoValue_dataset$intervention_type %>% replace_na("Not given")
 
-
 #remove additional IV2 rows for now  
 IntoValue_dataset <- IntoValue_dataset %>% 
   select(-indentification_step, -study_first_submitted_date,
          -summary_res_date, -start_date)
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# bring IV2 dataset in the same shape as the IV1 dataset used for the shiny app
+# with one row for each combination of trial & UMC for easy filtering
+#----------------------------------------------------------------------------------------------------------------------
 
 #spread out IV2 dataset to one row for each trial + participating lead city
 cities <- IntoValue_dataset$lead_cities %>% str_split(" ") %>% unlist() %>% unique() %>% sort()
@@ -140,18 +144,22 @@ cities_only_IV1
 cities_only_IV2
 
 
-#remove duplicate trials in IV1 dataset before joining! - for now we remove the results from IV1 in those cases
-dupl_trials <- IntoValue1_dataset[(IntoValue1_dataset$id %in% IntoValue_dataset$id),]
-IntoValue1_dataset_dedupl <- IntoValue1_dataset[!(IntoValue1_dataset$id %in% IntoValue_dataset$id),]
-
-
 #combine datasets
-IntoValue1_dataset_dedupl <- IntoValue1_dataset_dedupl %>% 
+IntoValue1_dataset <- IntoValue1_dataset %>% 
   mutate(IV_version = "IV1")
 IntoValue_dataset_trials_per_city <- IntoValue_dataset_trials_per_city %>% 
   mutate(IV_version = "IV2")
 
-IntoValue_dataset_comb <- rbind(IntoValue_dataset_trials_per_city, IntoValue1_dataset_dedupl)  %>%
+#remove duplicate trials in IV1 dataset before joining! - for now we remove the results from IV1 in those cases
+dupl_trials_IV1 <- IntoValue1_dataset[(IntoValue1_dataset$id %in% IntoValue_dataset$id),]$id
+dupl_trials_IV2 <- IntoValue_dataset_trials_per_city[(IntoValue_dataset_trials_per_city$id %in% IntoValue1_dataset$id),]$id
+
+IntoValue1_dataset[IntoValue1_dataset$id %in% dupl_trials_IV1,]$IV_version <- "IV1_dupl"
+IntoValue_dataset_trials_per_city[IntoValue_dataset_trials_per_city$id %in% dupl_trials_IV2,]$IV_version <- "IV2_dupl"
+
+
+
+IntoValue_dataset_comb <- rbind(IntoValue_dataset_trials_per_city, IntoValue1_dataset)  %>%
   mutate(completion_year = str_sub(completion_date, 1, 4))
 
 

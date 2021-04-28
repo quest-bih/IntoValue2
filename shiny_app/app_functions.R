@@ -102,7 +102,7 @@ set_days_observed <- function(compl_date_in, input_table) {
   
   #make vector with the cutoff dates for each trial
   cutoff_vec <- rep(dmy("01.12.2017"), dim(input_table)[1])
-  cutoff_vec[input_table$IV_version == "IV2"] <- dmy("01.12.2020")
+  cutoff_vec[input_table$IV_version %in% c("IV2", "IV2_dupl")] <- dmy("01.12.2020")
   
   
   if(compl_date_in == "Primary completion date (CT.gov only)") { 
@@ -154,8 +154,8 @@ filter_followup_time <- function(input_table, followup_time, compl_date_in) {
 
   has_long_followup_IV1 <- (input_table[[compl_col]] < cutoff_date_IV1)
   has_long_followup_IV2 <- (input_table[[compl_col]] < cutoff_date_IV2)
-  is_IV1 <- input_table[["IV_version"]] == "IV1"
-  is_IV2 <- input_table[["IV_version"]] == "IV2"
+  is_IV1 <- input_table[["IV_version"]] %in% c("IV1", "IV1_dupl")
+  is_IV2 <- input_table[["IV_version"]] %in% c("IV2", "IV2_dupl")
   
   has_long_followup <- (has_long_followup_IV1 & is_IV1) | (has_long_followup_IV2 & is_IV2)
 
@@ -398,13 +398,15 @@ set_complyear_status <- function(complyear_in) {
   return(complyear)
 }
 
+#when showing data for IV2 or IV1+2 show new results for duplicate trials
+#when showing old IV1 data only, show old results for duplicate trials
 set_study_version <- function(version_in) {
   if(version_in == "Any") {
-    version <- c("IV1", "IV2")
+    version <- c("IV1", "IV2", "IV2_dupl")
   } else if(version_in == "IntoValue1") {
-    version <- c("IV1")
+    version <- c("IV1", "IV1_dupl")
   } else {
-    version <- c("IV2")
+    version <- c("IV2", "IV2_dupl")
   }
 
   return(version)
