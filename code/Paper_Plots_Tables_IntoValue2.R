@@ -249,10 +249,40 @@ summary_result_num <- sum(CTgov_trials$days_to_summary < 2*365, na.rm = TRUE)
 perc_summary <- summary_result_num/CTgov_trial_num
 
 
+#check how many of the trials from IV1 now have summary results
+
+#the AACT dataset has to be downloaded first from https://aact.ctti-clinicaltrials.org/pipe_files
+AACT_folder <- "C:/Datenablage/AACT/AACT dataset 20200603/" #insert the AACT download folder here
+
+#AACT filenames that we need to load
+AACT_dataset_names <- c("studies", "overall_officials", "sponsors", "responsible_parties",
+                        "facilities", "interventions", "calculated_values")
+
+AACT_dataset_files <- paste0(AACT_folder, AACT_dataset_names, ".txt")
+AACT_datasets <- AACT_dataset_files %>%
+  map(read_delim, delim = "|", guess_max = 20000)
+names(AACT_datasets) <- AACT_dataset_names
+
+
+#get only the IV1 trails relevant for this comparison: 
+#lead trials with 24 months follow up time
+cutoff_date_IV1 <- dmy("01.12.2017") - months(24)
+IntoValue1_dataset_filtered <- IntoValue1_dataset %>%
+  filter(lead_or_facility == "lead")# %>%
+  #filter(completion_date < cutoff_date_IV1)
+
+IV1_trial_ids <- IntoValue1_dataset_filtered$id %>% unique()
+IV1_trial_ids <- IV1_trial_ids[IV1_trial_ids %>% str_sub(1,4) != "DRKS"]
+
+IV1_trials_new_results <- AACT_datasets$studies[AACT_datasets$studies$nct_id %in% IV1_trial_ids,]
+IV1_trials_summary_results <- IV1_trials_new_results %>%
+  filter(!is.na(results_first_submitted_date))
+IV1_trials_summary_results_num <- dim(IV1_trials_summary_results)[1]
+
+
 #--------------------------------------------------------------------------------------------------
 # cities results plot
 #--------------------------------------------------------------------------------------------------
-
 
 #use old IntoValue1 dataset
 IntoValue1_dataset <- IntoValue1_dataset %>%
