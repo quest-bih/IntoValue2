@@ -99,8 +99,10 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
          lead_cities = lead_cities %>% str_replace(fixed("Lübeck"), "Schleswig-Holstein"),
          is_CTgov = ifelse(is_CTgov == "yes", TRUE, FALSE),
          is_multicentric = ifelse(is_multicentric == "yes", TRUE, FALSE),
-         allocation  = allocation  %>% replace_na("Not given")
-         )
+         allocation  = allocation  %>% replace_na("Not given"),
+         has_german_umc_lead = if_else(lead_or_facility == "lead", TRUE, FALSE)
+         ) %>%
+  select(-lead_or_facility)
 
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -112,7 +114,7 @@ IntoValue2_dataset <- IntoValue2_dataset %>%
          days_CD_to_summary = days_to_summary,
          days_reg_to_CD = days_reg_to_compl,
          study_registration_date = study_first_submitted_date) %>%
-  mutate(lead_or_facility = "lead",
+  mutate(has_german_umc_lead = TRUE,
          publication_PMID = NA,
          facility_cities = NA)
 
