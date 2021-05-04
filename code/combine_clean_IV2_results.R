@@ -125,15 +125,15 @@ id_step_name <- function(id_step_num)
 {
   step_name = NA
   if(id_step_num == 0) {
-    step_name = "No publ found"
+    step_name = "No publ"
   } else if(id_step_num == 1) {
-    step_name = "Registry linked publ"
+    step_name = "Registry linked"
   } else if(id_step_num == 2) {
     step_name = "Publ found in Google ID search"
   } else if(id_step_num == 3) {
     step_name = "Publ found in Google search (no ID)"
   } else if(id_step_num == 8) {
-    step_name = "No publ found"
+    step_name = "No publ"
   }
   
   return(step_name)
@@ -158,9 +158,10 @@ intovalue2_results <- intovalue2_results %>%
          intervention_type = intervention_type %>% replace_na("Not given"),
          allocation  = allocation  %>% replace_na("Not given"),
          allocation  = allocation  %>% str_replace("N/A", "Not given"),
-         lead_cities = lead_cities %>% str_replace_all(" ", ","),
-         lead_cities = lead_cities %>% str_replace(fixed("TU"), "TU München"),
-         lead_cities = lead_cities %>% str_replace(fixed("LMU"), "LMU München"),
+         phase  = phase  %>% str_replace("N/A", "Not given"),
+         phase  = phase  %>% str_replace(fixed("[---]*"), "Not given"),
+         lead_cities = lead_cities %>% str_replace(fixed("TU"), "TU_München"),
+         lead_cities = lead_cities %>% str_replace(fixed("LMU"), "LMU_München"),
          lead_cities = lead_cities %>% str_replace(fixed("Charite"), "Berlin"))
 
 #reformat dates using lubridate and calculate time differences
@@ -180,6 +181,22 @@ intovalue2_results <- intovalue2_results %>%
 #filter out studies that are not part of the trial, as no UMC was affiliated with them
 intovalue2_results <- intovalue2_results %>%
   filter(identification_step != 9)
+
+
+#calculate and add center size = small/large
+#threshold defined as median of the total number of registered trials per institution
+cities_trial_num <- intovalue2_results$lead_cities %>% 
+  str_split(" ") %>% 
+  unlist() %>%
+  table()
+median_trial_num <- cities_trial_num %>% median()
+large_centers <- which(cities_trial_num > median_trial_num) %>% names()
+
+intovalue2_results <- intovalue2_results %>%
+  mutate(center_size = lead_cities %>% map_chr(function(x) 
+    ifelse(x %>% str_detect(large_centers) %>% any(), "large", "small")))
+
+
 
 #additional cleaning steps
 intovalue2_results <- intovalue2_results %>%
