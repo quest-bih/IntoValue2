@@ -1,6 +1,7 @@
 library(tidyverse)
 library(lubridate)
 library(assertthat)
+library(assertr)
 
 #----------------------------------------------------------------------------------------------------------------------
 # Loading of AACT dataset for additional variables
@@ -36,11 +37,12 @@ AACT_studies <- AACT_datasets$studies %>% select(nct_id, results_first_submitted
 DRKS_add_columns <- read_delim("generated_samples/DRKS/DRKS_combined.csv", delim = ";")  %>%
   select(drksId, allocation, masking, phase)
 
+
 #----------------------------------------------------------------------------------------------------------------------
-# Loading of results datasets
+# Loading and preprocessing of results datasets
 #----------------------------------------------------------------------------------------------------------------------
 
-
+#add missing AACT variables, change variable names and standardize values
 standardize_CTgov <- function(df) {
   df_std <- df %>%
     add_column("is_CTgov" = TRUE)  %>%
@@ -76,7 +78,7 @@ standardize_DRKS <- function(df) {
   return(df_std)
 }
 
-#standardize column names for joining
+#loading of manual results and standardize column names for joining
 CTgov_results <- read_csv("manual_check/final_results/IntoValue2_CTgov_results_main_check_including_DC.csv") %>%
   standardize_CTgov()
 DRKS_results <- read_csv("manual_check/final_results/IntoValue2_DRKS_results_main_check_including_DC.csv") %>%
@@ -100,34 +102,70 @@ analysis_cols <- c("id", "cities_lead_corrected",
                    "allocation", "masking",
                    "intervention_type")
 
-CTgov_results_join <- CTgov_results %>% select(analysis_cols)
-DRKS_results_join <- DRKS_results %>% select(analysis_cols)
-CTgov_DC_changes_join <- CTgov_DC_changes %>% select(analysis_cols)
-DRKS_DC_changes_join <- DRKS_DC_changes %>% select(analysis_cols)
+CTgov_results_join <- CTgov_results %>% select(all_of(analysis_cols))
+DRKS_results_join <- DRKS_results %>% select(all_of(analysis_cols))
+CTgov_DC_changes_join <- CTgov_DC_changes %>% select(all_of(analysis_cols))
+DRKS_DC_changes_join <- DRKS_DC_changes %>% select(all_of(analysis_cols))
 
 
 #implement double check changes to dataset - keep only the results from the DC changes
+#the distinct function only keeps the first occurence of the duplicate IDs
 CTgov_results_combined <- rbind(CTgov_DC_changes_join, CTgov_results_join) %>% 
-  distinct(id, .keep_all = TRUE)
+  distinct(id, .keep_all = TRUE) 
 DRKS_results_combined <- rbind(DRKS_DC_changes_join, DRKS_results_join) %>% 
   distinct(id, .keep_all = TRUE)
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# joining of datasets and further cleaning
+#----------------------------------------------------------------------------------------------------------------------
+
+#unify variables 
+id_step_name <- function(id_step_num)
+{
+  step_name = NA
+  if(id_step_num == 0) {
+    step_name = "No publ found"
+  } else if(id_step_num == 1) {
+    step_name = "Registry linked publ"
+  } else if(id_step_num == 2) {
+    step_name = "Publ found in Google ID search"
+  } else if(id_step_num == 3) {
+    step_name = "Publ found in Google search (no ID)"
+  } else if(id_step_num == 8) {
+    step_name = "No publ found"
+  }
+  
+  return(step_name)
+}
 
 #combine all results and rename and add missing columns to get same structure as the IntoValue1 dataset
 intovalue2_results <- rbind(CTgov_results_combined, DRKS_results_combined) 
 
-#remove publication date for all cases that are not counted as publication
+#remove publication date & URL for all cases that are not counted as publication
 intovalue2_results[intovalue2_results$indentification_step %in% c(0, 8),]$publication_date <- NA
 intovalue2_results[intovalue2_results$indentification_step %in% c(0, 8),]$publication_DOI <- NA
 intovalue2_results[intovalue2_results$indentification_step %in% c(0, 8),]$publication_URL <- NA
 
-
+#rename and reformat variables
 intovalue2_results <- intovalue2_results %>%
-  rename("has_summary_results" = "were_results_reported",
-         "lead_cities" = "cities_lead_corrected") %>%
-  mutate(has_publication = ifelse(indentification_step %in% c(1,2,3), TRUE, FALSE),
-         publication_date = dmy(publication_date),
+  rename(has_summary_results = were_results_reported,
+         lead_cities = cities_lead_corrected,
+         recruitment_status = overall_status,
+         identification_step = indentification_step) %>%
+  mutate(has_publication = ifelse(identification_step %in% c(1,2,3), TRUE, FALSE),
+         identification_step =  identification_step %>% map_chr(function(x) id_step_name(x)),
+         intervention_type = intervention_type %>% replace_na("Not given"),
+         allocation  = allocation  %>% replace_na("Not given"),
+         allocation  = allocation  %>% str_replace("N/A", "Not given"),
+         lead_cities = lead_cities %>% str_replace_all(" ", ","),
+         lead_cities = lead_cities %>% str_replace(fixed("TU"), "TU München"),
+         lead_cities = lead_cities %>% str_replace(fixed("LMU"), "LMU München"),
+         lead_cities = lead_cities %>% str_replace(fixed("Charite"), "Berlin"))
+
+#reformat dates using lubridate and calculate time differences
+intovalue2_results <- intovalue2_results %>%
+  mutate(publication_date = dmy(publication_date),
          completion_date = ymd(completion_date),
          study_first_submitted_date = ymd(study_first_submitted_date),
          start_date = ymd(start_date),
@@ -138,11 +176,32 @@ intovalue2_results <- intovalue2_results %>%
          days_reg_to_compl = completion_date - study_first_submitted_date,
          days_reg_to_publ = publication_date - study_first_submitted_date)
 
+
 #filter out studies that are not part of the trial, as no UMC was affiliated with them
 intovalue2_results <- intovalue2_results %>%
-  filter(indentification_step != 9)
+  filter(identification_step != 9)
+
+#additional cleaning steps
+intovalue2_results <- intovalue2_results %>%
+  mutate(
+  publication_DOI = str_trim(publication_DOI),
+  publication_URL = str_trim(publication_URL),
+  publication_DOI = str_remove(publication_DOI, "\\.$"),
+  publication_DOI = str_remove(publication_DOI, "https?://(dx\\.)?doi.org/"),
+  publication_DOI = str_remove(publication_DOI, "(?i)^doi\\s*"),
+  publication_DOI = tolower(publication_DOI),
+  publication_URL = tolower(publication_URL)
+  )
 
 
+#----------------------------------------------------------------------------------------------------------------------
+# assertion checks
+#----------------------------------------------------------------------------------------------------------------------
+
+intovalue2_results %>%
+  assert(function(doi) str_detect(doi, "^10\\.\\d{4,9}/[-.;()/:\\w\\d]+$")|is.na(doi), publication_DOI) %>%
+  assert(function(url) str_detect(url, "^http")|is.na(url), publication_URL) %>%
+  verify(nrow(filter(., has_publication & is.na(publication_URL) & is.na(publication_DOI))) == 0)
 
 #additional checks
 assert_that(any(intovalue2_results$has_publication & 
@@ -157,5 +216,9 @@ assert_that(!any(intovalue2_results$has_publication &
 missing_publ_date <- intovalue2_results[intovalue2_results$has_publication & 
                                           is.na(intovalue2_results$publication_date),]
 
+
+#----------------------------------------------------------------------------------------------------------------------
+# save cleaned IV2 dataset
+#----------------------------------------------------------------------------------------------------------------------
 
 write_csv(intovalue2_results, "data/IntoValue2_Dataset.csv")
