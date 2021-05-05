@@ -65,16 +65,17 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
 
 PCD_join <- AACT_datasets_IV2$studies %>% 
   select(nct_id, primary_completion_date, study_first_submitted_date) %>% 
-  rename(id = nct_id)
+  rename(id = nct_id,
+         study_registration_date = study_first_submitted_date)
 
 IntoValue2_dataset <- IntoValue2_dataset %>% 
   left_join(PCD_join) %>%
   mutate(primary_completion_year = primary_completion_date %>% str_sub(1,4),
          primary_completion_date = primary_completion_date %>% ymd(),
-         study_first_submitted_date = study_first_submitted_date %>% ymd(),
+         study_registration_date = study_registration_date %>% ymd(),
          days_PCD_to_summary = summary_res_date - primary_completion_date,
          days_PCD_to_publication = publication_date - primary_completion_date,
-         days_reg_to_PCD = primary_completion_date - study_first_submitted_date)
+         days_reg_to_PCD = primary_completion_date - study_registration_date)
 
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -112,8 +113,7 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
 IntoValue2_dataset <- IntoValue2_dataset %>% 
   rename(days_CD_to_publication = days_to_publication,
          days_CD_to_summary = days_to_summary,
-         days_reg_to_CD = days_reg_to_compl,
-         study_registration_date = study_first_submitted_date) %>%
+         days_reg_to_CD = days_reg_to_compl) %>%
   mutate(has_german_umc_lead = TRUE,
          publication_PMID = NA,
          facility_cities = NA)
@@ -151,4 +151,19 @@ IntoValue_datasets_comb <- rbind(IntoValue2_dataset, IntoValue1_dataset)  %>%
   mutate(completion_year = str_sub(completion_date, 1, 4))
 
 
-write_rds(IntoValue_datasets_comb, "data/IV1_IV2_combined_dataset.csv")
+#manually re-sort columns by topic
+IntoValue_datasets_comb <- IntoValue_datasets_comb %>%
+  select(id, lead_cities, has_publication, publication_DOI, publication_PMID,
+         publication_URL, publication_date, identification_step,
+         has_summary_results, summary_res_date,
+         study_registration_date, start_date, completion_date, 
+         completion_year, primary_completion_date, primary_completion_year, 
+         days_CD_to_publication, days_PCD_to_publication,
+         days_CD_to_summary, days_PCD_to_summary,
+         days_reg_to_start, days_reg_to_CD, days_reg_to_PCD, days_reg_to_publ,
+         recruitment_status, phase, enrollment, is_multicentric,
+         main_sponsor, allocation, masking, intervention_type,
+         center_size, is_CTgov,
+         has_german_umc_lead, facility_cities, IV_version)
+
+write_csv(IntoValue_datasets_comb, "data/IV1_IV2_combined_dataset.csv")
