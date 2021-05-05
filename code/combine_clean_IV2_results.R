@@ -197,7 +197,6 @@ intovalue2_results <- intovalue2_results %>%
     ifelse(x %>% str_detect(large_centers) %>% any(), "large", "small")))
 
 
-
 #additional cleaning steps
 intovalue2_results <- intovalue2_results %>%
   mutate(
@@ -211,6 +210,21 @@ intovalue2_results <- intovalue2_results %>%
   )
 
 
+#manually re-sort columns by topic
+intovalue2_results <- intovalue2_results %>%
+  select(id, lead_cities, has_publication, publication_DOI, 
+         publication_URL, publication_date, identification_step,
+         has_summary_results, summary_res_date,
+         study_first_submitted_date, start_date, completion_date,
+         days_to_publication, days_to_summary,
+         days_reg_to_start, days_reg_to_compl, days_reg_to_publ,
+         recruitment_status, phase, enrollment, is_multicentric,
+         main_sponsor, allocation, masking, intervention_type,
+         center_size, is_CTgov)
+         
+         
+         
+    
 #----------------------------------------------------------------------------------------------------------------------
 # assertion checks
 #----------------------------------------------------------------------------------------------------------------------
