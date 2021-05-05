@@ -14,7 +14,7 @@ publication_date: earliest publication date (format: yyyy-mm-dd, ePub or print p
 identification_step: In what stage was the publication found? (No publ/Registry linked/Publ found in Google ID search/Publ found in Google search (no ID))
 has_summary_results: were summary results found? (TRUE/FALSE)
 summary_res_date: date of summary results submission to registry (format: yyyy-mm-dd)
-study_first_submitted_date: date of study submission to registry (format: yyyy-mm-dd)
+study_registration_date: date of study submission to registry (format: yyyy-mm-dd)
 start_date: date of the study start as given on registry (format: yyyy-mm-dd)
 completion_date: completion date as given on CT.gov (format: yyyy-mm-dd, DRKS:study_end date)
 days_to_publication: number of days from completion date (DRKS:study_end date) to earliest publication date (format: yyyy-mm-dd, ePub or print pub date)

@@ -152,7 +152,8 @@ intovalue2_results <- intovalue2_results %>%
   rename(has_summary_results = were_results_reported,
          lead_cities = cities_lead_corrected,
          recruitment_status = overall_status,
-         identification_step = indentification_step) %>%
+         identification_step = indentification_step,
+         study_registration_date = study_first_submitted_date) %>%
   mutate(has_publication = ifelse(identification_step %in% c(1,2,3), TRUE, FALSE),
          identification_step =  identification_step %>% map_chr(function(x) id_step_name(x)),
          intervention_type = intervention_type %>% replace_na("Not given"),
@@ -168,14 +169,14 @@ intovalue2_results <- intovalue2_results %>%
 intovalue2_results <- intovalue2_results %>%
   mutate(publication_date = dmy(publication_date),
          completion_date = ymd(completion_date),
-         study_first_submitted_date = ymd(study_first_submitted_date),
+         study_registration_date = ymd(study_registration_date),
          start_date = ymd(start_date),
          summary_res_date = ymd(summary_res_date)) %>%
   mutate(days_to_publication = publication_date - completion_date,
          days_to_summary = summary_res_date - completion_date,
-         days_reg_to_start = start_date - study_first_submitted_date,
-         days_reg_to_compl = completion_date - study_first_submitted_date,
-         days_reg_to_publ = publication_date - study_first_submitted_date)
+         days_reg_to_start = start_date - study_registration_date,
+         days_reg_to_compl = completion_date - study_registration_date,
+         days_reg_to_publ = publication_date - study_registration_date)
 
 
 #filter out studies that are not part of the trial, as no UMC was affiliated with them
@@ -215,14 +216,12 @@ intovalue2_results <- intovalue2_results %>%
   select(id, lead_cities, has_publication, publication_DOI, 
          publication_URL, publication_date, identification_step,
          has_summary_results, summary_res_date,
-         study_first_submitted_date, start_date, completion_date,
+         study_registration_date, start_date, completion_date,
          days_to_publication, days_to_summary,
          days_reg_to_start, days_reg_to_compl, days_reg_to_publ,
          recruitment_status, phase, enrollment, is_multicentric,
          main_sponsor, allocation, masking, intervention_type,
          center_size, is_CTgov)
-         
-         
          
     
 #----------------------------------------------------------------------------------------------------------------------
