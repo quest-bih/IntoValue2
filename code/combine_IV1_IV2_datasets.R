@@ -6,7 +6,8 @@ library(lubridate)
 #----------------------------------------------------------------------------------------------------------------------
 
 #the AACT dataset has to be downloaded first from https://aact.ctti-clinicaltrials.org/pipe_files
-AACT_folder <- "C:/Datenablage/AACT/AACT dataset 20170416/" #insert the AACT download folder here
+# AACT_folder <- "C:/Datenablage/AACT/AACT dataset 20170416/" #insert the AACT download folder here
+AACT_folder <- "data/raw/AACT dataset 20170416/" #insert the AACT download folder here
 
 #AACT filenames that we need to load
 AACT_dataset_names <- c("studies", "overall_officials", "sponsors", "responsible_parties",
@@ -23,7 +24,8 @@ names(AACT_datasets_IV1) <- AACT_dataset_names
 #----------------------------------------------------------------------------------------------------------------------
 
 #the AACT dataset has to be downloaded first from https://aact.ctti-clinicaltrials.org/pipe_files
-AACT_folder <- "C:/Datenablage/AACT/AACT dataset 20200603/" #insert the AACT download folder here
+# AACT_folder <- "C:/Datenablage/AACT/AACT dataset 20200603/" #insert the AACT download folder here
+AACT_folder <- "data/raw/AACT dataset 20200603/" #insert the AACT download folder here
 
 #AACT filenames that we need to load
 AACT_dataset_names <- c("studies", "overall_officials", "sponsors", "responsible_parties",
@@ -46,6 +48,7 @@ IntoValue1_dataset <- read_csv("data/IntoValue1_Dataset.csv", na = "NA")
 
 #----------------------------------------------------------------------------------------------------------------------
 # add the missing registration and summary results date to the IV1 dataset
+# extract completion year
 #----------------------------------------------------------------------------------------------------------------------
 
 IV1_dates_join <- AACT_datasets_IV1$studies %>% 
@@ -56,26 +59,36 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
   left_join(IV1_dates_join) %>%
   rename(summary_res_date = first_received_results_date,
          study_registration_date = first_received_date) %>%
-  mutate(study_registration_date = study_registration_date %>% ymd())
+  mutate(study_registration_date = ymd(study_registration_date),
+         completion_year = year(completion_date))
 
 
 #----------------------------------------------------------------------------------------------------------------------
 # add the missing primary completion date to the IV2 dataset
+# aact changed the default for start and (primary) completion dates between IV1 and IV2
+# for IV1, dates default to first of month
+# for IV2, dates default to last of month
+# for consistency, recalculate IV2 dates from raw text (month year)
 #----------------------------------------------------------------------------------------------------------------------
 
 PCD_join <- AACT_datasets_IV2$studies %>% 
-  select(nct_id, primary_completion_date, study_first_submitted_date) %>% 
+  select(nct_id, study_first_submitted_date, 
+         start_month_year, completion_month_year, primary_completion_month_year) %>% 
   rename(id = nct_id,
          study_registration_date = study_first_submitted_date)
 
 IntoValue2_dataset <- IntoValue2_dataset %>% 
   left_join(PCD_join) %>%
-  mutate(primary_completion_year = primary_completion_date %>% str_sub(1,4),
-         primary_completion_date = primary_completion_date %>% ymd(),
-         study_registration_date = study_registration_date %>% ymd(),
+  mutate(start_date = as_date(parse_date_time(start_month_year, c("my", "mdY"))),
+         completion_date = as_date(parse_date_time(completion_month_year, c("my", "mdY"))),
+         completion_year = year(completion_date),
+         primary_completion_date = as_date(parse_date_time(primary_completion_month_year, c("my", "mdY"))),
+         primary_completion_year = year(primary_completion_date),
+         study_registration_date = ymd(study_registration_date),
          days_PCD_to_summary = summary_res_date - primary_completion_date,
          days_PCD_to_publication = publication_date - primary_completion_date,
-         days_reg_to_PCD = primary_completion_date - study_registration_date)
+         days_reg_to_PCD = primary_completion_date - study_registration_date) %>% 
+  select(-ends_with("month_year"))
 
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -147,8 +160,7 @@ IntoValue1_dataset[IntoValue1_dataset$id %in% dupl_trials_IV1,]$IV_version <- "I
 IntoValue2_dataset[IntoValue2_dataset$id %in% dupl_trials_IV2,]$IV_version <- "IV2_dupl"
 
 
-IntoValue_datasets_comb <- rbind(IntoValue2_dataset, IntoValue1_dataset)  %>%
-  mutate(completion_year = str_sub(completion_date, 1, 4))
+IntoValue_datasets_comb <- rbind(IntoValue2_dataset, IntoValue1_dataset)
 
 
 #manually re-sort columns by topic
