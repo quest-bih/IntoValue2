@@ -64,6 +64,7 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
 
 
 #----------------------------------------------------------------------------------------------------------------------
+# updates dates and days calculations for IV2 dataset
 # add the missing primary completion date to the IV2 dataset
 # aact changed the default for start and (primary) completion dates between IV1 and IV2
 # for IV1, dates default to first of month
@@ -79,16 +80,25 @@ PCD_join <- AACT_datasets_IV2$studies %>%
 
 IntoValue2_dataset <- IntoValue2_dataset %>% 
   left_join(PCD_join) %>%
+  rename(summary_results_date = summary_res_date,
+         days_reg_to_publication = days_reg_to_publ) %>% 
   mutate(start_date = as_date(parse_date_time(start_month_year, c("my", "mdY"))),
          completion_date = as_date(parse_date_time(completion_month_year, c("my", "mdY"))),
          completion_year = year(completion_date),
          primary_completion_date = as_date(parse_date_time(primary_completion_month_year, c("my", "mdY"))),
          primary_completion_year = year(primary_completion_date),
          registration_date = ymd(study_registration_date),
-         days_pcd_to_summary = summary_res_date - primary_completion_date,
+         days_cd_to_summary = summary_results_date - completion_date,
+         days_cd_to_publication = publication_date - completion_date,
+         days_reg_to_cd = completion_date - registration_date,
+         days_pcd_to_summary = summary_results_date - primary_completion_date,
          days_pcd_to_publication = publication_date - primary_completion_date,
          days_reg_to_pcd = primary_completion_date - registration_date) %>% 
-  select(-ends_with("month_year"), -study_registration_date)
+  select(-ends_with("month_year"), 
+         -c(study_registration_date, days_to_publication, days_to_summary, days_reg_to_compl)
+  )
+         
+
 
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -117,8 +127,8 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
          is_CTgov = ifelse(is_CTgov == "yes", TRUE, FALSE),
          is_multicentric = ifelse(is_multicentric == "yes", TRUE, FALSE),
          allocation  = allocation  %>% replace_na("Not given"),
-         has_german_umc_lead = if_else(lead_or_facility == "lead", TRUE, FALSE)
-         ) %>%
+         has_german_umc_lead = if_else(lead_or_facility == "lead", TRUE, FALSE),
+         facility_cities = na_if(facility_cities, "")) %>%
   select(-lead_or_facility)
 
 
@@ -126,16 +136,10 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
 # rename and modify IV2 variables
 #----------------------------------------------------------------------------------------------------------------------
 
-IntoValue2_dataset <- IntoValue2_dataset %>% 
-  rename(days_cd_to_publication = days_to_publication,
-         days_cd_to_summary = days_to_summary,
-         days_reg_to_cd = days_reg_to_compl,
-         summary_results_date = summary_res_date,
-         days_reg_to_publication = days_reg_to_publ) %>%
+IntoValue2_dataset <- IntoValue2_dataset %>%
   mutate(has_german_umc_lead = TRUE,
          publication_PMID = NA,
          facility_cities = NA)
-
 
 
 #check for missing rows
