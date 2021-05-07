@@ -82,9 +82,21 @@ IntoValue2_dataset <- IntoValue2_dataset %>%
   left_join(PCD_join) %>%
   rename(summary_results_date = summary_res_date,
          days_reg_to_publication = days_reg_to_publ) %>% 
-  mutate(start_date = as_date(parse_date_time(start_month_year, c("my", "mdY"))),
-         completion_date = as_date(parse_date_time(completion_month_year, c("my", "mdY"))),
-         completion_year = year(completion_date),
+  
+  # Get new ctgov date and merge with drks
+  # First make ctgov dates NA so no incorrect left over
+  mutate(
+    completion_date = if_else(is_CTgov, as_date(NA), completion_date),
+    completion_date_ctgov_updated = as_date(parse_date_time(completion_month_year, c("my", "mdY"))),
+    completion_date = coalesce(completion_date_ctgov_updated, completion_date),
+    
+    start_date = if_else(is_CTgov, as_date(NA), start_date),
+    start_date_ctgov_updated = as_date(parse_date_time(start_month_year, c("my", "mdY"))),
+    start_date = coalesce(start_date_ctgov_updated, start_date)
+  ) %>%
+  select(-completion_date_ctgov_updated, -start_date_ctgov_updated) %>% 
+  
+  mutate(completion_year = year(completion_date),
          primary_completion_date = as_date(parse_date_time(primary_completion_month_year, c("my", "mdY"))),
          primary_completion_year = year(primary_completion_date),
          registration_date = ymd(study_registration_date),
@@ -93,7 +105,8 @@ IntoValue2_dataset <- IntoValue2_dataset %>%
          days_reg_to_cd = completion_date - registration_date,
          days_pcd_to_summary = summary_results_date - primary_completion_date,
          days_pcd_to_publication = publication_date - primary_completion_date,
-         days_reg_to_pcd = primary_completion_date - registration_date) %>% 
+         days_reg_to_pcd = primary_completion_date - registration_date,
+         days_reg_to_start = start_date - registration_date) %>% 
   select(-ends_with("month_year"), 
          -c(study_registration_date, days_to_publication, days_to_summary, days_reg_to_compl)
   )
