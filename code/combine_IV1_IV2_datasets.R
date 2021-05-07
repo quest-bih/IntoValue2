@@ -57,9 +57,9 @@ IV1_dates_join <- AACT_datasets_IV1$studies %>%
 
 IntoValue1_dataset <- IntoValue1_dataset %>% 
   left_join(IV1_dates_join) %>%
-  rename(summary_res_date = first_received_results_date,
-         study_registration_date = first_received_date) %>%
-  mutate(study_registration_date = ymd(study_registration_date),
+  rename(summary_results_date = first_received_results_date,
+         registration_date = first_received_date) %>%
+  mutate(registration_date = ymd(registration_date),
          completion_year = year(completion_date))
 
 
@@ -84,11 +84,11 @@ IntoValue2_dataset <- IntoValue2_dataset %>%
          completion_year = year(completion_date),
          primary_completion_date = as_date(parse_date_time(primary_completion_month_year, c("my", "mdY"))),
          primary_completion_year = year(primary_completion_date),
-         study_registration_date = ymd(study_registration_date),
-         days_PCD_to_summary = summary_res_date - primary_completion_date,
-         days_PCD_to_publication = publication_date - primary_completion_date,
-         days_reg_to_PCD = primary_completion_date - study_registration_date) %>% 
-  select(-ends_with("month_year"))
+         registration_date = ymd(study_registration_date),
+         days_pcd_to_summary = summary_res_date - primary_completion_date,
+         days_pcd_to_publication = publication_date - primary_completion_date,
+         days_reg_to_pcd = primary_completion_date - registration_date) %>% 
+  select(-ends_with("month_year"), -study_registration_date)
 
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -102,10 +102,13 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
          has_publication = publications,
          has_summary_results = summary_results,
          recruitment_status = recruitmentStatus,
-         days_PCD_to_publication = days_to_publication_PCD,
-         days_CD_to_publication = days_to_publication_CD,
-         days_PCD_to_summary = days_to_summary_PCD,
-         days_CD_to_summary = days_to_summary_CD) %>%
+         days_pcd_to_publication = days_to_publication_PCD,
+         days_cd_to_publication = days_to_publication_CD,
+         days_pcd_to_summary = days_to_summary_PCD,
+         days_cd_to_summary = days_to_summary_CD,
+         days_reg_to_cd = days_reg_to_CD,
+         days_reg_to_pcd = days_reg_to_PCD,
+         days_reg_to_publication =days_reg_to_publ) %>%
   #to change seperator
   mutate(lead_cities = lead_cities %>% str_replace_all("TU München", "TU_München"),
          lead_cities = lead_cities %>% str_replace_all("LMU München", "LMU_München"),
@@ -124,9 +127,11 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
 #----------------------------------------------------------------------------------------------------------------------
 
 IntoValue2_dataset <- IntoValue2_dataset %>% 
-  rename(days_CD_to_publication = days_to_publication,
-         days_CD_to_summary = days_to_summary,
-         days_reg_to_CD = days_reg_to_compl) %>%
+  rename(days_cd_to_publication = days_to_publication,
+         days_cd_to_summary = days_to_summary,
+         days_reg_to_cd = days_reg_to_compl,
+         summary_results_date = summary_res_date,
+         days_reg_to_publication = days_reg_to_publ) %>%
   mutate(has_german_umc_lead = TRUE,
          publication_PMID = NA,
          facility_cities = NA)
@@ -141,41 +146,44 @@ IV2_notin_IV1
 
 
 #----------------------------------------------------------------------------------------------------------------------
-# bring IV2 dataset in the same shape as the IV1 dataset used for the shiny app
-# with one row for each combination of trial & UMC for easy filtering
+# combine iv datasets
 #----------------------------------------------------------------------------------------------------------------------
 
-
-#combine datasets
+#add iv version to datasets
 IntoValue1_dataset <- IntoValue1_dataset %>% 
-  mutate(IV_version = "IV1")
+  mutate(iv_version = 1)
 IntoValue2_dataset <- IntoValue2_dataset %>% 
-  mutate(IV_version = "IV2")
+  mutate(iv_version = 2)
 
-#clearly label the duplicate trials but do not remove them
-dupl_trials_IV1 <- IntoValue1_dataset[(IntoValue1_dataset$id %in% IntoValue2_dataset$id),]$id
-dupl_trials_IV2 <- IntoValue2_dataset[(IntoValue2_dataset$id %in% IntoValue1_dataset$id),]$id
-
-IntoValue1_dataset[IntoValue1_dataset$id %in% dupl_trials_IV1,]$IV_version <- "IV1_dupl"
-IntoValue2_dataset[IntoValue2_dataset$id %in% dupl_trials_IV2,]$IV_version <- "IV2_dupl"
-
-
-IntoValue_datasets_comb <- rbind(IntoValue2_dataset, IntoValue1_dataset)
+IntoValue_datasets_comb <- 
+  
+  #combine datasets
+  rbind(IntoValue2_dataset, IntoValue1_dataset) %>%
+  
+  #label duplicate trials (both iv1 and iv2 version labeled as dupes)
+  group_by(id) %>% 
+  mutate(is_dupe = if_else(n() > 1, TRUE, FALSE)) %>% 
+  ungroup()
 
 
 #manually re-sort columns by topic
 IntoValue_datasets_comb <- IntoValue_datasets_comb %>%
-  select(id, lead_cities, has_publication, publication_DOI, publication_PMID,
-         publication_URL, publication_date, identification_step,
-         has_summary_results, summary_res_date,
-         study_registration_date, start_date, completion_date, 
-         completion_year, primary_completion_date, primary_completion_year, 
-         days_CD_to_publication, days_PCD_to_publication,
-         days_CD_to_summary, days_PCD_to_summary,
-         days_reg_to_start, days_reg_to_CD, days_reg_to_PCD, days_reg_to_publ,
+  select(id, lead_cities, 
+         has_publication, 
+         publication_doi = publication_DOI, 
+         publication_pmid = publication_PMID, 
+         publication_url = publication_URL,
+         publication_date, identification_step,
+         has_summary_results, summary_results_date,
+         registration_date, start_date, 
+         completion_date, completion_year, 
+         primary_completion_date, primary_completion_year, 
+         days_cd_to_publication, days_pcd_to_publication,
+         days_cd_to_summary, days_pcd_to_summary,
+         days_reg_to_start, days_reg_to_cd, days_reg_to_pcd, days_reg_to_publication,
          recruitment_status, phase, enrollment, is_multicentric,
          main_sponsor, allocation, masking, intervention_type,
-         center_size, is_CTgov,
-         has_german_umc_lead, facility_cities, IV_version)
+         center_size, is_ctgov = is_CTgov, #QUESTION: change to `registry` with "ClinicalTrials.gov" and "DRKS"
+         has_german_umc_lead, facility_cities, iv_version, is_dupe)
 
 write_csv(IntoValue_datasets_comb, "data/IV1_IV2_combined_dataset.csv")
