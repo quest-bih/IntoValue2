@@ -28,6 +28,8 @@ pmids_from_dois <-
   filter(!is.na(pmid_converted)) %>%
   distinct()
 
+write_csv(pmids_from_dois, "data/pmids_from_dois.csv")
+
 # All pmids_from_dois should join back into intovalue
 if (nrow(anti_join(pmids_from_dois, intovalue, by = "publication_doi")) != 0){
   rlang::abort("There are pmids from dois that do not match intovalue dataset dois!")
@@ -46,6 +48,8 @@ dois_from_pmids <-
   ungroup() %>%
   filter(!is.na(doi_converted)) %>%
   distinct()
+
+write_csv(dois_from_pmids, "data/dois_from_pmids.csv")
 
 # All dois_from_pmids should join back into intovalue
 if (nrow(anti_join(dois_from_pmids, intovalue, by = "publication_pmid")) != 0){

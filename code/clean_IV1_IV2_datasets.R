@@ -299,7 +299,7 @@ intovalue_clean <-
   # Recalculate days to publication since date may have changes
   mutate(
     days_cd_to_publication = as.numeric(publication_date - completion_date), 
-    days_pcd_to_publicatio = as.numeric(publication_date - primary_completion_date), 
+    days_pcd_to_publication = as.numeric(publication_date - primary_completion_date), 
     days_reg_to_publication = as.numeric(publication_date - registration_date),
   )
 
