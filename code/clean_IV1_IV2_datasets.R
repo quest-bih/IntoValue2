@@ -18,11 +18,6 @@ intovalue_clean <-
   mutate(
     
     # Correct publications listed as "no publication"
-    # identification_step =
-    #   if_else(id == "DRKS00003240", "Registry linked", identification_step),
-    # has_publication =
-    #   if_else(id == "DRKS00003240", TRUE, has_publication),
-    
     identification_step = case_when(
       id == "DRKS00003240" ~ "Registry linked",
       id == "NCT00742495" ~ "Dissertation",
@@ -94,10 +89,6 @@ intovalue_clean <-
     identification_step = if_else(id == "NCT00806663", "Hand search", identification_step),
     publication_date = if_else(id == "NCT00806663", as_date("2014-05-07"), publication_date),
     
-    has_publication = if_else(id == "NCT01534702", TRUE, has_publication),
-    identification_step = if_else(id == "NCT01534702", "Hand search", identification_step),
-    publication_date = if_else(id == "NCT01534702", as_date("2018-10-30"), publication_date),
-    
     # Remove registry links from publications URL
     publication_url = if_else(
       str_detect(publication_url, "clinicaltrials.gov|drks.de"),
@@ -119,10 +110,8 @@ intovalue_clean <-
     ),
     
     # Remove publication date if no publication
-    # QUESTION: is this correct?
     publication_date = if_else(!has_publication, as_date(NA), publication_date),
     
-    # TODO: @Nico review
     # Add dates to trials with publications but no dates
     publication_date = case_when(
       id == "NCT00742495" ~ as_date("2016-07-25"),
@@ -137,16 +126,11 @@ intovalue_clean <-
     publication_url = if_else(id == "DRKS00000486", "https://elibrary.klett-cotta.de/article/99.120110/aep-8-3-175", publication_url),
     
     # Fix iv2 data entry error
-    # TODO: @Nico, fix in data
     publication_url = 
       if_else(id == "NCT02517775", "https://www.mdpi.com/2072-6643/9/3/268", publication_url),
     publication_doi = 
-      if_else(id == "NCT02517775", "10.3390/nu9030268", publication_doi),
-    
-    #TODO: could parse pmid from url: https://pubmed.ncbi.nlm.nih.gov/
-    # NCT01534702 in both IV1 and IV2 with results but neither has pmid, even after Fatcat. IV2 result (10.1111/bjh.15546), however, does have pmid, though missing from Fatcat, so add here.
-    publication_pmid = if_else(id == "NCT01534702", "30378121", publication_pmid)
-  ) %>% 
+      if_else(id == "NCT02517775", "10.3390/nu9030268", publication_doi)
+  ) %>%
   
   # Clean publication ids
   mutate(
@@ -257,6 +241,12 @@ intovalue_clean <-
               str_remove(publication_doi, "https?://.+$"),
               publication_doi),
     
+    # Extract pmid from pubmed urls
+    publication_pmid = if_else(str_detect(publication_url, 
+                              "^https://pubmed.ncbi.nlm.nih.gov/[0-9]{8}"),
+                   str_extract(publication_url, "[0-9]{8}"),
+                   publication_pmid, missing = publication_pmid),
+    
     # Correct doi typos
     publication_doi = case_when(
       publication_doi == "10.1002/cncr.2515"           ~ "10.1002/cncr.25156",
@@ -292,8 +282,6 @@ intovalue_clean <-
   # Convert formats
   mutate(
     publication_pmid = as.numeric(publication_pmid),
-    publication_doi = tolower(publication_doi),
-    publication_url = tolower(publication_url),
   ) %>% 
   
   # Recalculate days to publication since date may have changes
