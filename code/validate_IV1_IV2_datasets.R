@@ -71,4 +71,20 @@ intovalue %>%
   pointblank::col_vals_not_null(
     vars(publication_date),
     preconditions = ~ . %>% filter(has_publication)
+  ) %>% 
+  
+# Check that identification steps match iv version
+col_vals_in_set(
+  vars(identification_step),
+  c("No publ", "Registry linked", 
+    "Publ found in Google ID search", "Publ found in Google search (no ID)"),
+  preconditions = ~ . %>% filter(iv_version == 2)
+) %>% 
+  
+  col_vals_in_set(
+    vars(identification_step),
+    c("No publ", "Registry linked", 
+      "Abstract only", "Dissertation", "Hand search", "Pubmed"),
+    preconditions = ~ . %>% filter(iv_version == 1)
   )
+
