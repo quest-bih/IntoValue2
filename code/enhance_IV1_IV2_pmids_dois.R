@@ -29,6 +29,7 @@ pmids_from_dois <-
   distinct()
 
 write_csv(pmids_from_dois, "data/pmids_from_dois.csv")
+pmids_from_dois <- read_csv("data/pmids_from_dois.csv")
 
 # All pmids_from_dois should join back into intovalue
 if (nrow(anti_join(pmids_from_dois, intovalue, by = "publication_doi")) != 0){
@@ -50,6 +51,7 @@ dois_from_pmids <-
   distinct()
 
 write_csv(dois_from_pmids, "data/dois_from_pmids.csv")
+dois_from_pmids <- read_csv("data/dois_from_pmids.csv")
 
 # All dois_from_pmids should join back into intovalue
 if (nrow(anti_join(dois_from_pmids, intovalue, by = "publication_pmid")) != 0){

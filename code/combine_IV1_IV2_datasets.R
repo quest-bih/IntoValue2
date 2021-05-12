@@ -172,7 +172,7 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
 IntoValue2_dataset <- IntoValue2_dataset %>% 
   mutate(iv_version = 2)
 
-IntoValue_datasets_comb <- 
+IntoValue_datasets_comb <-
   
   #combine datasets
   rbind(IntoValue2_dataset, IntoValue1_dataset) %>%
@@ -180,17 +180,29 @@ IntoValue_datasets_comb <-
   #label duplicate trials (both iv1 and iv2 version labeled as dupes)
   group_by(id) %>% 
   mutate(is_dupe = if_else(n() > 1, TRUE, FALSE)) %>% 
-  ungroup()
+  ungroup() %>% 
+  
+  #calculate whether registration is prospective
+  #round start and registration to month and see whether the same month
+    mutate(
+      is_prospective = 
+        floor_date(registration_date, unit = "month") <=
+        floor_date(start_date, unit = "month")
+    ) %>%
+  
+  #convert is_ctgov to registry
+  mutate(registry = if_else(is_CTgov, "ClinicalTrials.gov", "DRKS"), .keep = "unused")
 
 
 #manually re-sort columns by topic
 IntoValue_datasets_comb <- IntoValue_datasets_comb %>%
-  select(id, lead_cities, 
+  select(id, registry, lead_cities, 
          has_publication, 
          publication_doi = publication_DOI, 
          publication_pmid = publication_PMID, 
          publication_url = publication_URL,
          publication_date, identification_step,
+         is_prospective,
          has_summary_results, summary_results_date,
          registration_date, start_date, 
          completion_date, completion_year, 
@@ -199,8 +211,7 @@ IntoValue_datasets_comb <- IntoValue_datasets_comb %>%
          days_cd_to_summary, days_pcd_to_summary,
          days_reg_to_start, days_reg_to_cd, days_reg_to_pcd, days_reg_to_publication,
          recruitment_status, phase, enrollment, is_multicentric,
-         main_sponsor, allocation, masking, intervention_type,
-         center_size, is_ctgov = is_CTgov, #QUESTION: change to `registry` with "ClinicalTrials.gov" and "DRKS"
+         main_sponsor, allocation, masking, intervention_type, center_size,
          has_german_umc_lead, facility_cities, iv_version, is_dupe)
 
 write_csv(IntoValue_datasets_comb, "data/IV1_IV2_combined_dataset.csv")
