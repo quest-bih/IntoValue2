@@ -1,0 +1,26 @@
+name,registry,level_registry,level_unified
+phase,ClinicalTrials.gov,Not given,NA
+phase,ClinicalTrials.gov,Phase 2,II
+phase,ClinicalTrials.gov,Phase 1,I
+phase,ClinicalTrials.gov,Phase 4,IV
+phase,ClinicalTrials.gov,Phase 1/Phase 2,I-II
+phase,ClinicalTrials.gov,Phase 2/Phase 3,II-III
+phase,ClinicalTrials.gov,Phase 3,III
+phase,ClinicalTrials.gov,Early Phase 1,I
+phase,DRKS,Not given,NA
+phase,DRKS,IV,IV
+phase,DRKS,III,III
+phase,DRKS,IIb,II
+phase,DRKS,I,I
+phase,DRKS,IIa,NA
+phase,DRKS,I-II,I-II
+phase,DRKS,II-III,II-III
+phase,DRKS,II,II
+phase,DRKS,IIIb,III
+recruitment_status,ClinicalTrials.gov,Completed,Completed
+recruitment_status,ClinicalTrials.gov,Unknown status,Other
+recruitment_status,ClinicalTrials.gov,Terminated,Other
+recruitment_status,ClinicalTrials.gov,Suspended,Other
+recruitment_status,DRKS,"Recruiting complete, follow-up complete",Completed
+recruitment_status,DRKS,Recruiting stopped after recruiting started,Other
+recruitment_status,DRKS,Recruiting suspended on temporary hold,Other
