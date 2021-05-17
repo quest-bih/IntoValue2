@@ -263,7 +263,7 @@ intovalue_clean <-
   # Note: Currently in a few steps, plus visually inspect any discrepancies to make sure "doi" is correct if also "new_doi" exists and different
   mutate(new_doi = str_extract(publication_url, "10\\.\\d{4,9}/[-.;()/:\\w\\d]+"), .before = publication_url) %>%
   mutate(publication_doi = coalesce(publication_doi, new_doi)) %>%
-  select(-new_doi) %>% 
+  select(-new_doi, -.before) %>% 
   
   # Fix urls
   mutate(
