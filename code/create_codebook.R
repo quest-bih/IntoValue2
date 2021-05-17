@@ -1,4 +1,3 @@
-# @Nico: In general, I added as much detail as I could about source of registry variables, but some detail is still missing to make the dataset reproducible, so please add in any missing details on which fields from ctgov/aact and drks (also csv vs. webscraping) each variable comes from
 
 library(tidyverse)
 
@@ -104,8 +103,7 @@ description <- tribble(
   "Trial registry, either ClinicalTrials.gov or DRKS",
   
   "lead_cities", 
-  "City or names of lead German university medical centers based on `affiliation` in registries. Derived from `sponsors`, `official`, and `responsible parties` from ClinicalTrials.gov, and any `addresses` from DRKS. Multiple UMCs (e.g., if study PI and sponsor organization have different affiliations) are separated by a single whitespace.", #@NICO: is this correct? or in IV1 some are lead? please edit to correct. i can't tell column names but i think it's in this: https://github.com/quest-bih/IntoValue2/blob/master/code/Create_DRKS_sample.R#L50
-  
+  "City or names of lead German university medical centers based on `affiliation` in registries. Derived from `sponsors`, `overall officials`, and `responsible parties` from ClinicalTrials.gov, and any `addresses` from DRKS. Multiple UMCs (e.g., if study PI and sponsor organization have different affiliations) are separated by a single whitespace.",
   
   "has_publication", 
   "Whether a publication was found. Abstracts only are NOT counted as publications, whereas dissertations are.",
@@ -123,16 +121,16 @@ description <- tribble(
   "Publication date. Manually entered during publication search. Earliest date used, whether ePub or print pub date.",
   
   "identification_step", 
-  "Manual publication search identification steps. Both versions include: No publ; Registry linked. Version 1 also includes: Abstract only; Dissertation; Hand search; Pubmed. Version 2 also includes: Publ found in Google ID search; Publ found in Google search (no ID). In version 2, abstracts only were not included, whereas dissertations were included.", #@NICO: any further clarification?
+  "Manual publication search identification steps. Both versions include: No publ; Registry linked. Version 1 also includes: Pubmed; Hand search (= Publication found via Google search); Abstract only; Dissertation. Version 2 also includes: Publ found in Google ID search; Publ found in Google search (no ID). In version 2, abstracts only were not included, whereas dissertations were included.",
   
   "is_prospective", 
   "Whether trial was prospectively registered. Derived from `registration_date` and `start_date`. Trial is considered prospectively registered if registered in the same or previous months to start date.",
   
   "has_summary_results", 
-  "Whether summary results found on registry during manual publication search. ClinicalTrials.gov includes a structured summary results field. DRKS includes summary results with other references, and summary results were determined based on manual inspection with names such as Ergebnisbericht or Abschlussbericht", #@NICO: any further clarification? is this correct that it's from manual search or was automated for ctgov?
+  "Whether summary results were posted on registry. ClinicalTrials.gov includes a structured summary results field. DRKS includes summary results with other references, and summary results were determined based on manual inspection with names such as Ergebnisbericht or Abschlussbericht",
   
   "summary_results_date", 
-  "Date of summary results submission to registry. ClinicalTrials.gov only. Manually entered during publication search.", #@NICO: summary results SUBMISSION or POSTED date? is this correct that it's from manual search or was automated for ctgov?
+  "Date of summary results submission to registry. Derived from `results_first_submitted_date` (field previously called `first_received_results_date`). ClinicalTrials.gov only.",
   
   "registration_date", 
   "Date of study submission to registry, as given on registry.",
@@ -147,16 +145,16 @@ description <- tribble(
   "Year of the study completion. Derived from `completion_date`.",
   
   "primary_completion_date", 
-  "Date of the study primary completion, as given on registry. ClinicalTrials.gov only [TODO]. ClinicalTrials.gov previously allowed primary completion dates without day, in which case date is defaulted to first of the month. In version 1, primary completion dates for DRKS are copied from completion dates.", #@NICO: DRKS doesn't have PCD right? i think we should remove.
+  "Date of the study primary completion, as given on registry. ClinicalTrials.gov only. ClinicalTrials.gov previously allowed primary completion dates without day, in which case date is defaulted to first of the month.",
   
   "primary_completion_year", 
-  "Year of the study primary completion. Derived from `primary_completion_date`. ClinicalTrials.gov only [TODO].", #@NICO: as above
+  "Year of the study primary completion. Derived from `primary_completion_date`. ClinicalTrials.gov only.",
   
   "days_cd_to_publication", 
   "Number of days from `completion_date` to `publication_date`. Derived.",
   
   "days_pcd_to_publication", 
-  "Number of days from `primary_completion_date` to `publication_date`. Derived. ClinicalTrials.gov only.", #@NICO currently has drks but if we remove pcd from drks then ctgov only
+  "Number of days from `primary_completion_date` to `publication_date`. Derived. ClinicalTrials.gov only.",
   
   "days_cd_to_summary", 
   "Number of days from `completion_date` to `summary_results_date`. Derived. ClinicalTrials.gov only.",
@@ -171,7 +169,7 @@ description <- tribble(
   "Number of days from `registration_date` to `completion_date`. Derived.",
   
   "days_reg_to_pcd", 
-  "Number of days from `registration_date` to `primary_completion_date`. ClinicalTrials.gov only.", #@NICO currently has drks but if we remove pcd from drks then ctgov only
+  "Number of days from `registration_date` to `primary_completion_date`. ClinicalTrials.gov only.",
   
   "days_reg_to_publication", 
   "Number of days from `registration_date` to `publication_date`. Derived.",
@@ -186,28 +184,31 @@ description <- tribble(
   "Number of trial participants, as given on registry. May be anticipated or actual number.",
   
   "is_multicentric", 
-  "Whether multiple study centers are involved, as given on registry. Derived based on registrsties.", #@NICO: any more info on how derived?
+  "Whether multiple study centers are involved, as given on registry. Derived from `has_single_facility` (CT.gov) and `monoMultiCentric` (DRKS).",
   
   "main_sponsor", 
-  "Whether main sponsor is industry or other, as given on registry. For ClinicalTrials.gov, other includes NIH.", #@NICO: any more info on how
+  "Whether main sponsor is industry or other, as given on registry. For ClinicalTrials.gov, other includes NIH.",
   
   "allocation", 
   "Trial allocation and randomization, as given on registry. Different levels for ClinicalTrials.gov and DRKS.",
   
+  "is_randomized", 
+  "Whether trial was randomized. Based on the 'allocation' variable. 'Randomized' or 'Randomized controlled trial' was counted as TRUE, while 'Non-Randomized, 'Non-randomized controlled trial', 'Other', and 'Single arm study' was counted as FALSE",
+  
   "masking", 
-  "Trial masking, as given on registry. Different levels for ClinicalTrials.gov and DRKS.", #@NICO: not sure which fields from ctgov and drks
+  "Trial masking, as given on registry. Different levels for ClinicalTrials.gov (Version 1: No masking, Open Label, Single Blind, Double Blind, Participant, Care Provider, Investigator, Outcomes Assessor; Version 2: None (Open Label), Single, Double, Triple, Quadruple) and DRKS (Open (masking not used), Single blind, Blinded, Double or multiple blind).",
   
   "intervention_type", 
-  "Trial intervention, as given on registry. Different levels for ClinicalTrials.gov and DRKS.", #@NICO: not sure which fields from ctgov and drks. also, i see multiple intervention_types in ctgov and drks, how do you select 1 for iv?
+  "Trial intervention, as given on registry. ClinicalTrials.gov only.", 
   
   "center_size", 
-  "Study center size classified as 'large' or 'small'. If no German UMC lead, 'No lead center'. Derived based on registrsties. Threshold defined as median of the total number of registered trials per institution.", #@NICO: I don't understand how this is derived. could you clarify?
+  "UMC classified as 'large' or 'small' dependent on the number of trials conducted. A UMC was classified as 'large' if it conducted more trials than the median trial number per UMC averaged over all UMCs included in the IntoValue1 or Intovalue2 study. If no German UMC lead, 'No lead center'.",
   
   "has_german_umc_lead", 
   "Whether German UMC in trial `lead_cities` (sponsor, PI, or responsible party) or only in `facility_cities`. Version 2 includes only trials with German UMC lead.",
   
   "facility_cities", 
-  "City or names of facility German university medical centers based on `affiliation` in registries. Derived from `sponsors`, `official`, and `responsible parties` from ClinicalTrials.gov, and any `addresses` from DRKS. Multiple UMCs (e.g., if study PI and sponsor organization have different affiliations) are separated by a single whitespace. Only used in version 1; in version 2, all NA.", #@NICO: what is the source for facility cities? aka how differentiated from lead cities? please change the "derived" sentences to reflect this.
+  "City or names of facility German university medical centers based on `affiliation` in registries. Derived from 'facilities' from ClinicalTrials.gov, and 'recruitmentLocation' from DRKS. Multiple UMCs (i.e. if one trial lists multiple facilities) are separated by a single whitespace. Only used in version 1; in version 2, all NA.",
   
   "iv_version", 
   "IntoValue version, either 1 or 2.",
