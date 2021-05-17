@@ -188,11 +188,21 @@ IntoValue_datasets_comb <-
   
   #calculate whether registration is prospective
   #round start and registration to month and see whether the same month
-    mutate(
-      is_prospective = 
-        floor_date(registration_date, unit = "month") <=
-        floor_date(start_date, unit = "month")
-    ) %>%
+  mutate(
+    is_prospective = 
+      floor_date(registration_date, unit = "month") <=
+      floor_date(start_date, unit = "month")
+  ) %>%
+  
+  #make boolean is_randomized column
+  mutate(
+    is_randomized = case_when(
+      allocation %in% c("Randomized", "Randomized controlled trial") ~ TRUE,
+      allocation %in% c("Non-Randomized", "Non-randomized controlled trial",
+                        "Other", "Single arm study") ~ FALSE,
+      allocation == "Not given" ~ NA
+    )
+  ) %>%
   
   #convert is_ctgov to registry
   mutate(registry = if_else(is_CTgov, "ClinicalTrials.gov", "DRKS"), .keep = "unused")
@@ -215,7 +225,7 @@ IntoValue_datasets_comb <- IntoValue_datasets_comb %>%
          days_cd_to_summary, days_pcd_to_summary,
          days_reg_to_start, days_reg_to_cd, days_reg_to_pcd, days_reg_to_publication,
          recruitment_status, phase, enrollment, is_multicentric,
-         main_sponsor, allocation, masking, intervention_type, center_size,
+         main_sponsor, allocation, is_randomized, masking, intervention_type, center_size,
          has_german_umc_lead, facility_cities, iv_version, is_dupe)
 
 write_csv(IntoValue_datasets_comb, "data/IV1_IV2_combined_dataset.csv")
