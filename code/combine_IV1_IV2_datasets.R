@@ -120,6 +120,10 @@ IntoValue2_dataset <- IntoValue2_dataset %>%
 
 IntoValue1_dataset$is_multicentric[IntoValue1_dataset$is_multicentric == "Not given"] <- NA
 
+#DRKS only has a completion date - remove PCD entries from DRKS entries in IV1 dataset
+IntoValue1_dataset$primary_completion_date[IntoValue1_dataset$is_CTgov == "no"] <- NA
+IntoValue1_dataset$primary_completion_year[IntoValue1_dataset$is_CTgov == "no"] <- NA
+
 IntoValue1_dataset <- IntoValue1_dataset %>%
   rename(identification_step = publication_type,
          has_publication = publications,
