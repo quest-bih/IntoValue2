@@ -124,6 +124,7 @@ IntoValue1_dataset$is_multicentric[IntoValue1_dataset$is_multicentric == "Not gi
 IntoValue1_dataset$primary_completion_date[IntoValue1_dataset$is_CTgov == "no"] <- NA
 IntoValue1_dataset$primary_completion_year[IntoValue1_dataset$is_CTgov == "no"] <- NA
 IntoValue1_dataset$days_reg_to_PCD[IntoValue1_dataset$is_CTgov == "no"] <- NA
+IntoValue1_dataset$days_to_publication_PCD[IntoValue1_dataset$is_CTgov == "no"] <- NA
 
 
 IntoValue1_dataset <- IntoValue1_dataset %>%
@@ -137,7 +138,7 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
          days_cd_to_summary = days_to_summary_CD,
          days_reg_to_cd = days_reg_to_CD,
          days_reg_to_pcd = days_reg_to_PCD,
-         days_reg_to_publication =days_reg_to_publ) %>%
+         days_reg_to_publication = days_reg_to_publ) %>%
   #to change seperator
   mutate(lead_cities = lead_cities %>% str_replace_all("TU München", "TU_München"),
          lead_cities = lead_cities %>% str_replace_all("LMU München", "LMU_München"),
