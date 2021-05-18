@@ -120,6 +120,13 @@ IntoValue2_dataset <- IntoValue2_dataset %>%
 
 IntoValue1_dataset$is_multicentric[IntoValue1_dataset$is_multicentric == "Not given"] <- NA
 
+#DRKS only has a completion date - remove PCD entries from DRKS entries in IV1 dataset
+IntoValue1_dataset$primary_completion_date[IntoValue1_dataset$is_CTgov == "no"] <- NA
+IntoValue1_dataset$primary_completion_year[IntoValue1_dataset$is_CTgov == "no"] <- NA
+IntoValue1_dataset$days_reg_to_PCD[IntoValue1_dataset$is_CTgov == "no"] <- NA
+IntoValue1_dataset$days_to_publication_PCD[IntoValue1_dataset$is_CTgov == "no"] <- NA
+
+
 IntoValue1_dataset <- IntoValue1_dataset %>%
   rename(identification_step = publication_type,
          has_publication = publications,
@@ -131,7 +138,7 @@ IntoValue1_dataset <- IntoValue1_dataset %>%
          days_cd_to_summary = days_to_summary_CD,
          days_reg_to_cd = days_reg_to_CD,
          days_reg_to_pcd = days_reg_to_PCD,
-         days_reg_to_publication =days_reg_to_publ) %>%
+         days_reg_to_publication = days_reg_to_publ) %>%
   #to change seperator
   mutate(lead_cities = lead_cities %>% str_replace_all("TU München", "TU_München"),
          lead_cities = lead_cities %>% str_replace_all("LMU München", "LMU_München"),
@@ -184,11 +191,21 @@ IntoValue_datasets_comb <-
   
   #calculate whether registration is prospective
   #round start and registration to month and see whether the same month
-    mutate(
-      is_prospective = 
-        floor_date(registration_date, unit = "month") <=
-        floor_date(start_date, unit = "month")
-    ) %>%
+  mutate(
+    is_prospective = 
+      floor_date(registration_date, unit = "month") <=
+      floor_date(start_date, unit = "month")
+  ) %>%
+  
+  #make boolean is_randomized column
+  mutate(
+    is_randomized = case_when(
+      allocation %in% c("Randomized", "Randomized controlled trial") ~ TRUE,
+      allocation %in% c("Non-Randomized", "Non-randomized controlled trial",
+                        "Other", "Single arm study") ~ FALSE,
+      allocation == "Not given" ~ NA
+    )
+  ) %>%
   
   #convert is_ctgov to registry
   mutate(registry = if_else(is_CTgov, "ClinicalTrials.gov", "DRKS"), .keep = "unused")
@@ -211,7 +228,7 @@ IntoValue_datasets_comb <- IntoValue_datasets_comb %>%
          days_cd_to_summary, days_pcd_to_summary,
          days_reg_to_start, days_reg_to_cd, days_reg_to_pcd, days_reg_to_publication,
          recruitment_status, phase, enrollment, is_multicentric,
-         main_sponsor, allocation, masking, intervention_type, center_size,
+         main_sponsor, allocation, is_randomized, masking, intervention_type, center_size,
          has_german_umc_lead, facility_cities, iv_version, is_dupe)
 
 write_csv(IntoValue_datasets_comb, "data/IV1_IV2_combined_dataset.csv")

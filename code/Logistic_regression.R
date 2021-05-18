@@ -18,46 +18,37 @@ library(lubridate)
 #  data cleaning - determine center size (large/small) & unify trial phases
 #----------------------------------------------------------------------------------------------------------------------
 
-unify_trial_phases <- function(phase)
-{
-  phase_out <- ""
-
-  if(phase %in% c("Early Phase 1", "I", "Phase 1")) {
-    phase_out <- "I"
-  } else if(phase %in% c("I-II", "Phase 1/Phase 2")) {
-    phase_out <- "I-II"
-  } else if(phase %in% c("II", "IIb", "Phase 2")) {
-    phase_out <- "II"
-  } else if(phase %in% c("II-III", "Phase 2/Phase 3")) {
-    phase_out <- "II-III"
-  } else if(phase %in% c("III", "IIIb", "Phase 3")) {
-    phase_out <- "III"
-  } else if(phase %in% c("IV", "Phase 4")) {
-    phase_out <- "IV"
-  } else {
-    phase_out <- "No Phase"
-  }
-
-  return(phase_out)
-}
-
-
-unify_status <- function(status)
-{
-  status_out <- ""
-  
-  if(status %in% c("Completed", "Recruiting complete, follow-up complete")) {
-    status_out <- "Completed"
-  } else {
-    status_out <- "Other"
-  }
-  
-  return(status_out)
-}
-
-
 #read in IntoValue dataset
-IntoValue_studies <- read_csv("data/IntoValue2_Dataset.csv", na = "NA")
+# IntoValue_studies <- read_csv("data/IntoValue2_Dataset.csv", na = "NA")
+IntoValue_studies <- 
+  read_csv(
+    "data/iv_enhanced_pmids_dois_dataset.csv",
+    col_types = cols(
+      publication_pmid = col_number(),
+      facility_cities = col_character()
+    )
+  )
+  
+#read in registry lookup table to unify ctgov and drks levels
+lookup_registries <- read_csv("data/iv_data_lookup_registries.csv")
+
+lookup_phase <- 
+  lookup_registries %>% 
+  filter(name == "phase") %>% 
+  select(-name)
+
+lookup_recruitment_status <- 
+  lookup_registries %>% 
+  filter(name == "recruitment_status") %>% 
+  select(-name)
+
+IntoValue_studies <-
+  IntoValue_studies %>% 
+  left_join(lookup_phase, by = c("registry", "phase" = "level_registry")) %>% 
+  select(-phase, phase = level_unified) %>% 
+  left_join(lookup_recruitment_status, by = c("registry", "recruitment_status" = "level_registry")) %>% 
+  select(-recruitment_status, recruitment_status = level_unified)
+
 
 IntoValue_studies <- IntoValue_studies %>%
   #filter(!is.na(enrollment)) %>% #filter out 3 cases where no participant number is given in order to produce the same model size for all cases
@@ -90,11 +81,6 @@ large_centers <- which(cities_trial_num > median_trial_num) %>% names()
 IntoValue_studies <- IntoValue_studies %>%
   mutate(center_size = lead_cities %>% map_chr(function(x) 
     ifelse(x %>% str_detect(large_centers) %>% any(), "large", "small")))
-
-
-IntoValue_studies$phase <- map_chr(IntoValue_studies$phase, unify_trial_phases)
-IntoValue_studies$overall_status <- map_chr(IntoValue_studies$overall_status, unify_status)
-
 
 
 #different publication rates for the categories detected in the logistic regression model

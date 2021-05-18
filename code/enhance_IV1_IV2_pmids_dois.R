@@ -99,4 +99,4 @@ rlang::inform(glue::glue(
   DOIs still missing for {n_missing_dois_after} trials with PMIDs."
 ))
 
-write_csv(intovalue_pmids_dois, "data/iv_enhanced_pmids_dois_dataset.csv")
+write_csv(intovalue_pmids_dois, "data/iv_main_dataset.csv")

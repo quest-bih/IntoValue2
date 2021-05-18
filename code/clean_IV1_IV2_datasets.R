@@ -129,7 +129,15 @@ intovalue_clean <-
     publication_url = 
       if_else(id == "NCT02517775", "https://www.mdpi.com/2072-6643/9/3/268", publication_url),
     publication_doi = 
-      if_else(id == "NCT02517775", "10.3390/nu9030268", publication_doi)
+      if_else(id == "NCT02517775", "10.3390/nu9030268", publication_doi),
+    
+    # Add iv1 doi (not in fatcat)
+    publication_doi = 
+      if_else(id == "NCT00552981", "10.5694/j.1326-5377.2010.tb04127.x", publication_doi),
+    
+    # Remove iv1 invalid pmid
+    publication_pmid = 
+      if_else(id == "NCT01123811", NA_character_, publication_pmid)
   ) %>%
   
   # Clean publication ids
@@ -289,6 +297,9 @@ intovalue_clean <-
     days_cd_to_publication = as.numeric(publication_date - completion_date), 
     days_pcd_to_publication = as.numeric(publication_date - primary_completion_date), 
     days_reg_to_publication = as.numeric(publication_date - registration_date),
-  )
+  ) %>% 
+  
+  # Rearrange rows
+  arrange(iv_version, desc(has_publication))
 
 write_csv(intovalue_clean, "data/iv_clean_dataset.csv")
