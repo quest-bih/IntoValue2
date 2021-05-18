@@ -44,24 +44,26 @@ intovalue_clean <-
     
     # Correct iv1 trial with registry result in cross-reg, incorrectly indicated as having publications
     # Note: DRKS00004156 and NCT00215683 are duplicated in the iv1 dataset, as the cross-registration was missed. Nico is looking into deduping.
-    has_publication = if_else(id == "DRKS00004156", FALSE, has_publication),
-    identification_step = if_else(id == "DRKS00004156", "No publ", identification_step),
-    has_summary_results = if_else(id == "DRKS00004156", TRUE, has_summary_results),
-    
+
     # Some drks trials with uploaded summary results miscounted as publications
     # Change to has_summary_results and !has_publication
-    # Note: all iv2 except "DRKS00004744"
+    # Note: all iv2 except "DRKS00004744" and "DRKS00004156"
     has_publication = if_else(
-      id %in% c("DRKS00000635", "DRKS00000156", "DRKS00006734", "DRKS00006766", "DRKS00007163", "DRKS00004744"),
+      id %in% c("DRKS00000635", "DRKS00000156", "DRKS00006734", "DRKS00006766", "DRKS00007163", "DRKS00004744", "DRKS00004156"),
       FALSE, has_publication
     ),
     identification_step = if_else(
-      id %in% c("DRKS00000635", "DRKS00000156", "DRKS00006734", "DRKS00006766", "DRKS00007163", "DRKS00004744"),
+      id %in% c("DRKS00000635", "DRKS00000156", "DRKS00006734", "DRKS00006766", "DRKS00007163", "DRKS00004744", "DRKS00004156"),
       "No publ", identification_step
     ),
     has_summary_results = if_else(
-      id %in% c("DRKS00000635", "DRKS00000156", "DRKS00006734", "DRKS00006766", "DRKS00007163", "DRKS00004744"),
+      id %in% c("DRKS00000635", "DRKS00000156", "DRKS00006734", "DRKS00006766", "DRKS00007163", "DRKS00004744", "DRKS00004156"),
       TRUE, has_summary_results
+    ),
+    #need to move the publication date to the summary results date as well
+    summary_results_date = if_else(
+      id %in% c("DRKS00000635", "DRKS00000156", "DRKS00006734", "DRKS00006766", "DRKS00007163", "DRKS00004744", "DRKS00004156"),
+      publication_date, summary_results_date
     ),
     
     # Change drks trial to abstract only, since noticed not full publication
@@ -292,11 +294,13 @@ intovalue_clean <-
     publication_pmid = as.numeric(publication_pmid),
   ) %>% 
   
-  # Recalculate days to publication since date may have changes
+  # Recalculate days to publication & summary since date may have changes
   mutate(
     days_cd_to_publication = as.numeric(publication_date - completion_date), 
     days_pcd_to_publication = as.numeric(publication_date - primary_completion_date), 
     days_reg_to_publication = as.numeric(publication_date - registration_date),
+    days_cd_to_summary = as.numeric(summary_results_date - completion_date), 
+    days_pcd_to_summary = as.numeric(summary_results_date - primary_completion_date)
   ) %>% 
   
   # Rearrange rows
