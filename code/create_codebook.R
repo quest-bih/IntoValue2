@@ -1,15 +1,6 @@
-
 library(tidyverse)
 
-intovalue <- 
-  read_csv(
-    "data/iv_enhanced_pmids_dois_dataset.csv",
-    col_types = cols(
-      publication_pmid = col_number(),
-      facility_cities = col_character()
-    )
-  )
-
+intovalue <- read_csv("data/iv_main_dataset.csv")
 
 # Get levels of variables as a string (colon-separated)
 # Optionally, limit by registry
@@ -127,7 +118,7 @@ description <- tribble(
   "Whether trial was prospectively registered. Derived from `registration_date` and `start_date`. Trial is considered prospectively registered if registered in the same or previous months to start date.",
   
   "has_summary_results", 
-  "Whether summary results were posted on registry. ClinicalTrials.gov includes a structured summary results field. DRKS includes summary results with other references, and summary results were determined based on manual inspection with names such as Ergebnisbericht or Abschlussbericht",
+  "Whether summary results were posted on registry. ClinicalTrials.gov includes a structured summary results field. DRKS includes summary results with other references, and summary results were determined based on manual inspection with names such as Ergebnisbericht or Abschlussbericht.",
   
   "summary_results_date", 
   "Date of summary results submission to registry. Derived from `results_first_submitted_date` (field previously called `first_received_results_date`). ClinicalTrials.gov only.",
@@ -139,7 +130,7 @@ description <- tribble(
   "Date of the study start, as given on registry. ClinicalTrials.gov previously allowed start dates without day, in which case date is defaulted to first of the month.",
   
   "completion_date", 
-  "Date of the study completion, as given on registry. ClinicalTrials.gov previously allowed completion dates without day, in which case date is defaulted to first of the month. Indicated as study end date on DRKS.",
+  "Date of the study completion, as given on registry. ClinicalTrials.gov previously allowed completion dates without day, in which case date is defaulted to first of the month. Indicated as `study end date` on DRKS.",
   
   "completion_year", 
   "Year of the study completion. Derived from `completion_date`.",
@@ -187,7 +178,7 @@ description <- tribble(
   "Whether multiple study centers are involved, as given on registry. Derived from `has_single_facility` (CT.gov) and `monoMultiCentric` (DRKS).",
   
   "main_sponsor", 
-  "Whether main sponsor is industry or other, as given on registry. For ClinicalTrials.gov, other includes NIH.",
+  "Whether main sponsor is industry or other, as given on registry. For ClinicalTrials.gov, sourced from `agency_class` in `sponsors` datatable , and `Other` includes NIH. For DRKS, sourced from `investigator initiated`.",
   
   "allocation", 
   "Trial allocation and randomization, as given on registry. Different levels for ClinicalTrials.gov and DRKS.",
@@ -202,14 +193,14 @@ description <- tribble(
   "Trial intervention, as given on registry. ClinicalTrials.gov only.", 
   
   "center_size", 
-  "UMC classified as 'large' or 'small' dependent on the number of trials conducted. A UMC was classified as 'large' if it conducted more trials than the median trial number per UMC averaged over all UMCs included in the IntoValue1 or Intovalue2 study. If no German UMC lead, 'No lead center'.",
+  "UMC classified as 'large' or 'small' depending on the number of trials led per `lead_cities`. A UMC was classified as 'large' if it conducted more trials than the median trial number per UMC across all UMCs included in the IntoValue1 or Intovalue2 studies, respectively. If trial has no German UMC lead, 'No lead center'.",
   
   "has_german_umc_lead", 
   "Whether German UMC in trial `lead_cities` (sponsor, PI, or responsible party) or only in `facility_cities`. Version 2 includes only trials with German UMC lead.",
   
   "facility_cities", 
-  "City or names of facility German university medical centers based on `affiliation` in registries. Derived from 'facilities' from ClinicalTrials.gov, and 'recruitmentLocation' from DRKS. Multiple UMCs (i.e. if one trial lists multiple facilities) are separated by a single whitespace. Only used in version 1; in version 2, all NA.",
-  
+  "City or names of facility German university medical centers based on `affiliation` in registries. Derived from 'facilities' from ClinicalTrials.gov, and 'recruitmentLocation' from DRKS. Multiple UMCs (i.e., if one trial lists multiple facilities) are separated by a single whitespace. Only used in version 1; in version 2, all NA.",
+
   "iv_version", 
   "IntoValue version, either 1 or 2.",
   

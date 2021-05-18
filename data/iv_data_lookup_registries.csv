@@ -1,26 +1,49 @@
 name,registry,level_registry,level_unified
-phase,ClinicalTrials.gov,Not given,NA
-phase,ClinicalTrials.gov,Phase 2,II
-phase,ClinicalTrials.gov,Phase 1,I
-phase,ClinicalTrials.gov,Phase 4,IV
 phase,ClinicalTrials.gov,Phase 1/Phase 2,I-II
-phase,ClinicalTrials.gov,Phase 2/Phase 3,II-III
 phase,ClinicalTrials.gov,Phase 3,III
+phase,ClinicalTrials.gov,Phase 2,II
+phase,ClinicalTrials.gov,Phase 2/Phase 3,II-III
+phase,ClinicalTrials.gov,Phase 4,IV
+phase,ClinicalTrials.gov,Not given,NA
+phase,ClinicalTrials.gov,Phase 1,I
 phase,ClinicalTrials.gov,Early Phase 1,I
 phase,DRKS,Not given,NA
-phase,DRKS,IV,IV
-phase,DRKS,III,III
-phase,DRKS,IIb,II
-phase,DRKS,I,I
-phase,DRKS,IIa,NA
-phase,DRKS,I-II,I-II
-phase,DRKS,II-III,II-III
 phase,DRKS,II,II
+phase,DRKS,III,III
+phase,DRKS,IV,IV
+phase,DRKS,I,I
+phase,DRKS,I-II,I-II
+phase,DRKS,IIb,II
 phase,DRKS,IIIb,III
+phase,DRKS,II-III,II-III
+phase,DRKS,IIa,II
+recruitment_status,ClinicalTrials.gov,Terminated,Other
 recruitment_status,ClinicalTrials.gov,Completed,Completed
 recruitment_status,ClinicalTrials.gov,Unknown status,Other
-recruitment_status,ClinicalTrials.gov,Terminated,Other
 recruitment_status,ClinicalTrials.gov,Suspended,Other
 recruitment_status,DRKS,"Recruiting complete, follow-up complete",Completed
 recruitment_status,DRKS,Recruiting stopped after recruiting started,Other
 recruitment_status,DRKS,Recruiting suspended on temporary hold,Other
+masking,ClinicalTrials.gov,Open Label,Open label
+masking,ClinicalTrials.gov,NA,NA
+masking,ClinicalTrials.gov,Double Blind,Double or multiple blind
+masking,ClinicalTrials.gov,Single Blind,Single blind
+masking,ClinicalTrials.gov,Double-Blind,Double or multiple blind
+masking,ClinicalTrials.gov,No masking,Open label
+masking,ClinicalTrials.gov,"Participant, Investigator",Blinded other
+masking,ClinicalTrials.gov,Participant,Blinded other
+masking,ClinicalTrials.gov,"Participant, Care Provider, Investigator, Outcomes Assessor",Blinded other
+masking,ClinicalTrials.gov,"Participant, Care Provider, Investigator",Blinded other
+masking,ClinicalTrials.gov,"Participant, Outcomes Assessor",Blinded other
+masking,ClinicalTrials.gov,"Participant, Investigator, Outcomes Assessor",Blinded other
+masking,ClinicalTrials.gov,Outcomes Assessor,Blinded other
+masking,DRKS,NA,NA
+masking,DRKS,Open (masking not used),Open label
+masking,DRKS,Single blind,Single blind
+masking,DRKS,Double or multiple blind,Double or multiple blind
+masking,ClinicalTrials.gov,None (Open Label),Open label
+masking,ClinicalTrials.gov,Single,Single blind
+masking,ClinicalTrials.gov,Triple,Double or multiple blind
+masking,ClinicalTrials.gov,Quadruple,Double or multiple blind
+masking,ClinicalTrials.gov,Double,Double or multiple blind
+masking,DRKS,Blinded,Blinded unspecified
