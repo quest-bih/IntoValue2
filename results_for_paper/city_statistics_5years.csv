@@ -1,7 +1,7 @@
 City,Trials,Published <60m after CD,Percentage
 Aachen,29,16,55.2
-All,749,535,71.4
-Berlin,87,65,74.7
+All,749,534,71.3
+Berlin,87,64,73.6
 Bochum,17,12,70.6
 Bonn,14,8,57.1
 Dresden,14,9,64.3
@@ -21,7 +21,7 @@ Homburg,5,5,100
 Jena,7,5,71.4
 Köln,35,28,80
 Leipzig,34,30,88.2
-LMU-München,21,15,71.4
+LMU-München_München,21,15,71.4
 Magdeburg,9,5,55.6
 Mainz,18,15,83.3
 Mannheim,17,9,52.9
@@ -30,7 +30,7 @@ Münster,17,12,70.6
 Regensburg,15,12,80
 Rostock,5,4,80
 Schleswig-Holstein,31,24,77.4
-TU-München,48,39,81.2
+TU-München_München,48,39,81.2
 Tübingen,33,22,66.7
 Ulm,14,12,85.7
 Witten-Herdecke,4,3,75
