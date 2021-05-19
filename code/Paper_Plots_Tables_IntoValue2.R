@@ -132,8 +132,8 @@ assert_that(sum(!is.na(IntoValue_dataset_cities$days_to_publ)) ==
 
 IntoValue_dataset_cities$lead_cities <- IntoValue_dataset_cities$lead_cities %>% 
   str_replace_all("Charite", "Berlin") %>%
-  str_replace_all("TU", "TU-München") %>%
-  str_replace_all("LMU", "LMU-München")
+  str_replace_all("TU_München", "TU-München") %>%
+  str_replace_all("LMU_München", "LMU-München")
 
 IntoValue_dataset_cities$lead_cities <- paste("All", IntoValue_dataset_cities$lead_cities)
 
@@ -305,8 +305,8 @@ IntoValue1_dataset <- IntoValue1_dataset[has_long_followup,]
 IntoValue1_dataset$lead_cities <- IntoValue1_dataset$lead_cities %>% 
   str_replace_all("Lübeck", "Schleswig-Holstein") %>%
   str_replace_all("Kiel", "Schleswig-Holstein") %>%
-  str_replace_all("TU", "TU-München") %>%
-  str_replace_all("LMU", "LMU-München")
+  str_replace_all("TU_München", "TU-München") %>%
+  str_replace_all("LMU_München", "LMU-München")
 
 IntoValue1_dataset$lead_cities <- paste("All", IntoValue1_dataset$lead_cities)
 

@@ -40,7 +40,7 @@ ggplot(data=city_statistics,aes(x=City,y=odds_ratio, color=is_sig))+
   geom_hline(yintercept = 1.0, linetype = "dotted", size = 1) +
   scale_y_log10(breaks = c(0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10),
                 minor_breaks = NULL) +
-  labs(y = "Odds ratio", x = "City") +
+  labs(y = "Odds ratio", x = "University medical center") +
   coord_flip(ylim = c(0.1, 15)) +
   theme_minimal() + 
   theme(legend.position = "none") +
