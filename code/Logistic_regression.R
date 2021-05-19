@@ -19,15 +19,9 @@ library(lubridate)
 #----------------------------------------------------------------------------------------------------------------------
 
 #read in IntoValue dataset
-# IntoValue_studies <- read_csv("data/IntoValue2_Dataset.csv", na = "NA")
-IntoValue_studies <- 
-  read_csv(
-    "data/iv_enhanced_pmids_dois_dataset.csv",
-    col_types = cols(
-      publication_pmid = col_number(),
-      facility_cities = col_character()
-    )
-  )
+IntoValue_studies <- read_csv("data/iv_main_dataset.csv", na = "NA") %>%
+  filter(iv_version == 2)
+
   
 #read in registry lookup table to unify ctgov and drks levels
 lookup_registries <- read_csv("data/iv_data_lookup_registries.csv")
@@ -52,18 +46,14 @@ IntoValue_studies <-
 
 IntoValue_studies <- IntoValue_studies %>%
   #filter(!is.na(enrollment)) %>% #filter out 3 cases where no participant number is given in order to produce the same model size for all cases
-  mutate(days_to_publ = pmin(days_to_publication,   #get minimum of days to pub or to summary result
-                             days_to_summary, na.rm = TRUE)) %>%
-  mutate(timely_publication = days_to_publ < 2*365)
-
-IntoValue_studies$timely_publication <-
-  IntoValue_studies$timely_publication %>% replace_na(FALSE)
-IntoValue_studies$intervention_type <-
-  IntoValue_studies$intervention_type %>% replace_na("Not given")
+  mutate(days_to_publ_summary = pmin(days_cd_to_publication,   #get minimum of days to pub or to summary result
+                                     days_cd_to_summary, na.rm = TRUE)) %>%
+  mutate(timely_publication = days_to_publ_summary < 2*365)
 
 IntoValue_studies <- IntoValue_studies %>%
+  mutate(timely_publication = timely_publication %>% replace_na(FALSE)) %>%
   mutate(medication = intervention_type == "Drug") %>%
-  mutate(completion_year = completion_date %>% str_sub(1,4))
+  mutate(phase = phase %>% replace_na("Not given"))
 
 
 #define center size = small/large
@@ -84,12 +74,12 @@ IntoValue_studies <- IntoValue_studies %>%
 
 
 #different publication rates for the categories detected in the logistic regression model
-overall_status_publ_rates <- IntoValue_studies %>% 
-  group_by(overall_status, timely_publication) %>% 
+recruitment_status_publ_rates <- IntoValue_studies %>% 
+  group_by(recruitment_status, timely_publication) %>% 
   summarise(count = n())
 
-completed_pub_rate <- overall_status_publ_rates$count[2]/sum(overall_status_publ_rates$count[1:2])
-other_pub_rate <- overall_status_publ_rates$count[4]/sum(overall_status_publ_rates$count[3:4])
+completed_pub_rate <- recruitment_status_publ_rates$count[2]/sum(recruitment_status_publ_rates$count[1:2])
+other_pub_rate <- recruitment_status_publ_rates$count[4]/sum(recruitment_status_publ_rates$count[3:4])
 completed_pub_rate
 other_pub_rate
 
@@ -132,7 +122,7 @@ models_1 <- list(m0 = glm(timely_publication ~ 1, family = binomial(),data=IntoV
                  m5 = glm(timely_publication ~ ifelse(main_sponsor == "Industry", 1, 0), family = binomial(),data=IntoValue_studies),
                  m6 = glm(timely_publication ~ enrollment, family = binomial(),data=IntoValue_studies),
                  m7 = glm(timely_publication ~ as.factor(completion_year), family = binomial(),data=IntoValue_studies),
-                 m8 = glm(timely_publication ~ overall_status, family = binomial(),data=IntoValue_studies))
+                 m8 = glm(timely_publication ~ recruitment_status, family = binomial(),data=IntoValue_studies))
 
 comparison_1 <- map2(models_1[1], models_1[2:9], lrtest)
 log_lik <- comparison_1 %>% map_dbl(function(x) x$LogLik[2])
@@ -175,14 +165,14 @@ min_model <- which.min(comparison_1_summary$aic)
 
 
 #second step, adding the next explanatory variable
-models_2 = list(m0 = glm(timely_publication ~ overall_status, family = binomial(),data=IntoValue_studies),
-                m1 = glm(timely_publication ~ overall_status + medication, family = binomial(),data=IntoValue_studies),
-                m2 = glm(timely_publication ~ overall_status + center_size, family = binomial(),data=IntoValue_studies),
-                m3 = glm(timely_publication ~ overall_status + is_multicentric, family = binomial(),data=IntoValue_studies),
-                m4 = glm(timely_publication ~ overall_status + phase, family = binomial(),data=IntoValue_studies),
-                m5 = glm(timely_publication ~ overall_status + main_sponsor, family = binomial(),data=IntoValue_studies),
-                m6 = glm(timely_publication ~ overall_status + enrollment, family = binomial(),data=IntoValue_studies),
-                m7 = glm(timely_publication ~ overall_status + as.factor(completion_year), family = binomial(),data=IntoValue_studies))
+models_2 = list(m0 = glm(timely_publication ~ recruitment_status, family = binomial(),data=IntoValue_studies),
+                m1 = glm(timely_publication ~ recruitment_status + medication, family = binomial(),data=IntoValue_studies),
+                m2 = glm(timely_publication ~ recruitment_status + center_size, family = binomial(),data=IntoValue_studies),
+                m3 = glm(timely_publication ~ recruitment_status + is_multicentric, family = binomial(),data=IntoValue_studies),
+                m4 = glm(timely_publication ~ recruitment_status + phase, family = binomial(),data=IntoValue_studies),
+                m5 = glm(timely_publication ~ recruitment_status + main_sponsor, family = binomial(),data=IntoValue_studies),
+                m6 = glm(timely_publication ~ recruitment_status + enrollment, family = binomial(),data=IntoValue_studies),
+                m7 = glm(timely_publication ~ recruitment_status + as.factor(completion_year), family = binomial(),data=IntoValue_studies))
 
 comparison_2 <- map2(models_2[1], models_2[2:8], lrtest)
 log_lik <- comparison_2 %>% map_dbl(function(x) x$LogLik[2])
@@ -200,13 +190,13 @@ min_model_2 <- which.min(comparison_2_summary$aic)
 
 
 #third step, adding the next explanatory variable
-models_3 = list(m0 = glm(timely_publication ~ overall_status + is_multicentric, family = binomial(),data=IntoValue_studies),
-                m1 = glm(timely_publication ~ overall_status + is_multicentric + medication, family = binomial(),data=IntoValue_studies),
-                m2 = glm(timely_publication ~ overall_status + is_multicentric + center_size, family = binomial(),data=IntoValue_studies),
-                m3 = glm(timely_publication ~ overall_status + is_multicentric + phase, family = binomial(),data=IntoValue_studies),
-                m4 = glm(timely_publication ~ overall_status + is_multicentric + main_sponsor, family = binomial(),data=IntoValue_studies),
-                m5 = glm(timely_publication ~ overall_status + is_multicentric + enrollment, family = binomial(),data=IntoValue_studies),
-                m6 = glm(timely_publication ~ overall_status + is_multicentric + as.factor(completion_year), family = binomial(),data=IntoValue_studies))
+models_3 = list(m0 = glm(timely_publication ~ recruitment_status + is_multicentric, family = binomial(),data=IntoValue_studies),
+                m1 = glm(timely_publication ~ recruitment_status + is_multicentric + medication, family = binomial(),data=IntoValue_studies),
+                m2 = glm(timely_publication ~ recruitment_status + is_multicentric + center_size, family = binomial(),data=IntoValue_studies),
+                m3 = glm(timely_publication ~ recruitment_status + is_multicentric + phase, family = binomial(),data=IntoValue_studies),
+                m4 = glm(timely_publication ~ recruitment_status + is_multicentric + main_sponsor, family = binomial(),data=IntoValue_studies),
+                m5 = glm(timely_publication ~ recruitment_status + is_multicentric + enrollment, family = binomial(),data=IntoValue_studies),
+                m6 = glm(timely_publication ~ recruitment_status + is_multicentric + as.factor(completion_year), family = binomial(),data=IntoValue_studies))
 
 comparison_3 <- map2(models_3[1], models_3[2:7], lrtest)
 log_lik <- comparison_3 %>% map_dbl(function(x) x$LogLik[2])
