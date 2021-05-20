@@ -15,11 +15,22 @@ source("app_functions.R", encoding = "UTF-8")
 
 #read in .rds output from Journal_Whitelist_script.R here
 IntoValue_app_table <- readRDS("data/IntoValue_Dataset_combined.rds")
-delayed_registration_table <- readRDS("data/CT_gov_delayed_registration_3.rds")
+delayed_registration_table <- readRDS("data/CT_gov_delayed_registration_3.rds") %>%
+  rename(recruitment_status = recruitmentStatus)
 
 #rename Duisburg to Duisburg-Essen
 IntoValue_app_table$city <- IntoValue_app_table$city %>% str_replace("Duisburg", "Duisburg-Essen")
 delayed_registration_table$city <- delayed_registration_table$city %>% str_replace("Duisburg", "Duisburg-Essen")
+
+#merge iv_version and is_dupe column for easier filtering
+IntoValue_app_table <- IntoValue_app_table %>% 
+  mutate(iv_version = case_when(
+    iv_version == 1 & !is_dupe  ~ "IV1",
+    iv_version == 1 & is_dupe  ~ "IV1_dupl",
+    iv_version == 2 & !is_dupe  ~ "IV2",
+    iv_version == 2 & is_dupe  ~ "IV2_dupl"
+  ),
+  is_multicentric = is_multicentric %>% replace_na("Not given"))
 
 
 IntoValue_studies_only <- IntoValue_app_table %>%
@@ -53,8 +64,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                                 selectInput('publ', 'Count summary results', c("Publications and Summary results", "Publications", "Summary results (CT.gov only)")),
                                                 selectInput('complDate', 'Count from which completion date', c("Completion date", "Primary completion date (CT.gov only)")),
                                                 selectInput('timeframe', 'Published within how many month', c("12", "24", "30", "36", "48", "60", "Any duration (trials with >6 years follow-up period)", "Any duration (any follow-up period)"), selected = "24"),
-                                                selectInput('pubType', 'Publication identified in which stage', c("Registry only", "Registry + Pubmed",
-                                                                                                                  "Full search (incl. Google Scholar + Web of Science)"), selected = "Full search (incl. Google Scholar + Web of Science)"),
+                                                selectInput('pubType', 'Publication identified in which stage', c("Registry only", "Full search (incl. Google Scholar)"), selected = "Full search (incl. Google Scholar)"),
                                                 helpText('There are different ways to define what a timely publication is. First, study results can either be
                                                           posted as summary results on the registry or published in a peer-reviewed journal. Second,
                                                           there are different dates on which a study could be considered completed: either the primary
@@ -177,8 +187,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                      selectInput('tab_publ', 'Count summary results', c("Publications and Summary results", "Publications", "Summary results (CT.gov only)")),
                                      selectInput('tab_complDate', 'Count from which completion date', c("Completion date", "Primary completion date (CT.gov only)")),
                                      selectInput('tab_timeframe', 'Published within how many month', c("12", "24", "30", "36", "48", "60", "Any duration (trials with >6 years follow-up period)", "Any duration (any follow-up period)"), selected = "24"),
-                                     selectInput('tab_pubType', 'Publication identified in which stage', c("Registry only", "Registry + Pubmed",
-                                                                                                           "Full search (incl. Google Scholar + Web of Science)"), selected = "Full search (incl. Google Scholar + Web of Science)"),
+                                     selectInput('tab_pubType', 'Publication identified in which stage', c("Registry only", "Full search (incl. Google Scholar)"), selected = "Full search (incl. Google Scholar)"),
                                      helpText('There are different ways to define what a timely publication is. First, study results can either be
                                         posted as summary results on the registry or published in a peer-reviewed journal. Second,
                                               there are different dates on which a study could be considered completed: either the primary
@@ -371,14 +380,14 @@ server <- function(input, output) {
 
   cum_dist_plot <- reactive({
 
-    registry_status <- set_registry_status(input$cumRegistry)
+    registry_sub <- set_registry(input$cumRegistry)
     compl_status <- set_compl_status(input$cumStatus)
     sponsor_status <- set_sponsor_status(input$cumSponsor)
 
     #filter for registration timepoint & completion status and group by cities
     IntoValue_KM_data <- IntoValue_studies_only %>%
-      filter(is_CTgov %in% registry_status) %>%
-      filter(recruitmentStatus %in% compl_status) %>%
+      filter(registry %in% registry_sub) %>%
+      filter(recruitment_status %in% compl_status) %>%
       filter(lead_or_facility %in% sponsor_status)
 
     days_to_pub <- set_days_to_publ(input$cumPubl, input$cumComplDate, IntoValue_KM_data)

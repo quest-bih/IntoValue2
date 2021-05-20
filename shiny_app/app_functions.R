@@ -68,11 +68,11 @@ set_days_to_publ <- function(summary_type_in, compl_date_in, input_table) {
 
   if(summary_type_in == "Publications and Summary results") {
     if(compl_date_in == "Primary completion date (CT.gov only)") {
-      days_to_pub_col <- input_table$`Days to publication PCD`
-      days_to_sum_col <- input_table$`Days to summary PCD`
+      days_to_pub_col <- input_table$days_pcd_to_publication
+      days_to_sum_col <- input_table$days_pcd_to_summary
     } else {
-      days_to_pub_col <- input_table$`Days to publication CD`
-      days_to_sum_col <- input_table$`Days to summary CD`
+      days_to_pub_col <- input_table$days_cd_to_publication
+      days_to_sum_col <- input_table$days_cd_to_summary
     }
 
     days_to_pub <- pmin(days_to_pub_col, days_to_sum_col, na.rm = TRUE)
@@ -80,15 +80,15 @@ set_days_to_publ <- function(summary_type_in, compl_date_in, input_table) {
     #                        function(x, y) ifelse( !all(is.na(c(x, y))), min(x, y, na.rm = TRUE), NA))
   } else if (summary_type_in == "Publications") {
     if(compl_date_in == "Primary completion date (CT.gov only)") {
-      days_to_pub <- input_table[["Days to publication PCD"]]
+      days_to_pub <- input_table$days_pcd_to_publication
     } else {
-      days_to_pub <- input_table[["Days to publication CD"]]
+      days_to_pub <- input_table$days_cd_to_publication
     }
   } else {
     if(compl_date_in == "Primary completion date (CT.gov only)") {
-      days_to_pub <- input_table[["Days to summary PCD"]]
+      days_to_pub <- input_table$days_pcd_to_summary
     } else {
-      days_to_pub <- input_table[["Days to summary CD"]]
+      days_to_pub <- input_table$days_cd_to_summary
     }
   }
 
@@ -102,7 +102,7 @@ set_days_observed <- function(compl_date_in, input_table) {
   
   #make vector with the cutoff dates for each trial
   cutoff_vec <- rep(dmy("01.12.2017"), dim(input_table)[1])
-  cutoff_vec[input_table$IV_version %in% c("IV2", "IV2_dupl")] <- dmy("01.12.2020")
+  cutoff_vec[input_table$iv_version %in% c("IV2", "IV2_dupl")] <- dmy("01.12.2020")
   
   
   if(compl_date_in == "Primary completion date (CT.gov only)") { 
@@ -154,8 +154,8 @@ filter_followup_time <- function(input_table, followup_time, compl_date_in) {
 
   has_long_followup_IV1 <- (input_table[[compl_col]] < cutoff_date_IV1)
   has_long_followup_IV2 <- (input_table[[compl_col]] < cutoff_date_IV2)
-  is_IV1 <- input_table[["IV_version"]] %in% c("IV1", "IV1_dupl")
-  is_IV2 <- input_table[["IV_version"]] %in% c("IV2", "IV2_dupl")
+  is_IV1 <- input_table[["iv_version"]] %in% c("IV1", "IV1_dupl")
+  is_IV2 <- input_table[["iv_version"]] %in% c("IV2", "IV2_dupl")
   
   has_long_followup <- (has_long_followup_IV1 & is_IV1) | (has_long_followup_IV2 & is_IV2)
 
@@ -165,8 +165,9 @@ filter_followup_time <- function(input_table, followup_time, compl_date_in) {
 
 set_publ_type <- function(publ_type_in) {
   #first select which publications are counted
-  if(publ_type_in == "Full search (incl. Google Scholar + Web of Science)") {
-    publ_type = c("Registry linked", "Pubmed", "Hand search", "Dissertation", "Google ID search")
+  if(publ_type_in == "Full search (incl. Google Scholar)") {
+    publ_type = c("Registry linked", "Pubmed", "Hand search", "Dissertation", 
+                  "Publ found in Google ID search", "Publ found in Google search (no ID)")
   } else if(publ_type_in == "Registry + Pubmed") {
     publ_type = c("Registry linked", "Pubmed")
   } else {
@@ -181,16 +182,16 @@ set_publ_type <- function(publ_type_in) {
 # functions to process the subset input options
 #--------------------------------------------------------------------------------------------------
 
-set_registry_status <- function(registry_status_in) {
-  if(registry_status_in == "CT.gov + DRKS") {
-    registry_status <- c("yes", "no")
-  } else if(registry_status_in == "CT.gov") {
-    registry_status <- c("yes")
+set_registry <- function(registry_in) {
+  if(registry_in == "CT.gov + DRKS") {
+    registry <- c("ClinicalTrials.gov", "DRKS")
+  } else if(registry_in == "CT.gov") {
+    registry <- c("ClinicalTrials.gov")
   } else {
-    registry_status <- c("no")
+    registry <- c("DRKS")
   }
 
-  return(registry_status)
+  return(registry)
 }
 
 
@@ -271,18 +272,6 @@ set_multicentric_status <- function(multicentric_in) {
   return(multicentric)
 }
 
-set_publication_status <- function(has_publ_in) {
-  if(has_publ_in == "Any") {
-    multicentric <- c("TRUE", "FALSE")
-  } else if(has_publ_in == "Studies with results publication") {
-    multicentric <- c("TRUE")
-  } else {
-    multicentric <- c("FALSE")
-  }
-
-  return(multicentric)
-}
-
 
 set_industry_status <- function(industry_in) {
   if(industry_in == "Any") {
@@ -301,7 +290,8 @@ set_phase_status <- function(phase_sub_in) {
   if(phase_sub_in == "Any") {
     phase_sub <- c("Early Phase 1", "I", "Phase 1", "I-II", "Phase 1/Phase 2",
                    "II", "IIa", "IIb", "Phase 2", "II-III", "Phase 2/Phase 3",
-                   "III", "IIIb", "Phase 3", "IV", "Phase 4", "N/A", "NA", "[---]*")
+                   "III", "IIIb", "Phase 3", "IV", "Phase 4", "N/A", "NA", "[---]*",
+                   "Not given")
   } else if(phase_sub_in == "I") {
     phase_sub <- c("Early Phase 1", "I", "Phase 1")
   } else if(phase_sub_in == "I-II") {
@@ -315,7 +305,7 @@ set_phase_status <- function(phase_sub_in) {
   } else if(phase_sub_in == "IV") {
     phase_sub <- c("IV", "Phase 4")
   } else {
-    phase_sub <- c("N/A", "NA")
+    phase_sub <- c("N/A", "NA", "Not given")
   }
 
   return(phase_sub)
@@ -324,11 +314,11 @@ set_phase_status <- function(phase_sub_in) {
 
 set_reg_time <- function(reg_time_in, input_table) {
   switch(reg_time_in,
-         "Any" = {reg_filter <- rep(TRUE, length(input_table$days_start_to_reg))},
-         "Before trail start" = {reg_filter <- input_table$days_start_to_reg >= 0},
-         "After trial start" = {reg_filter <- input_table$days_start_to_reg < 0},
-         "21 days after trial start" = {reg_filter <- input_table$days_start_to_reg < -21},
-         "60 days after trial start" = {reg_filter <- input_table$days_start_to_reg < -60},
+         "Any" = {reg_filter <- rep(TRUE, length(input_table$days_reg_to_start))},
+         "Before trail start" = {reg_filter <- input_table$days_reg_to_start >= 0},
+         "After trial start" = {reg_filter <- input_table$days_reg_to_start < 0},
+         "21 days after trial start" = {reg_filter <- input_table$days_reg_to_start < -21},
+         "60 days after trial start" = {reg_filter <- input_table$days_reg_to_start < -60},
          "After trial completion (CD)" = {reg_filter <- input_table$days_CD_to_reg < 0},
          "After trial completion (PCD)" = {reg_filter <- input_table$days_PCD_to_reg < 0},
          "After publication" = {reg_filter <- input_table$days_publ_to_reg < 0}
@@ -445,7 +435,7 @@ make_basic_city_tab <- function(input_data, delayed = FALSE)
 #uses all the currently choosen input options to filter the dataset accordingly
 make_table_data <- function(input_table, summary_type_in, compl_status_in, sponsor_status_in, compl_date_in,
                             month_to_publ_in, reg_time_in, multicentric_in, industry_in, phase_sub_in,
-                            publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, version_in, delayed = FALSE)
+                            publ_type_in, registry_in, intervention_in, participants_in, complyear_in, version_in, delayed = FALSE)
 {
 
   #set variables for timely publication options
@@ -455,7 +445,7 @@ make_table_data <- function(input_table, summary_type_in, compl_status_in, spons
   publ_type <- set_publ_type(publ_type_in)
 
   #set variables for subset options
-  registry_status <- set_registry_status(registry_status_in)
+  registry_sub <- set_registry(registry_in)
   compl_status <- set_compl_status(compl_status_in)
   sponsor_status <- set_sponsor_status(sponsor_status_in)
   multicentric <- set_multicentric_status(multicentric_in)
@@ -472,13 +462,12 @@ make_table_data <- function(input_table, summary_type_in, compl_status_in, spons
   #(summary results or publications) the publication type of some publications has to be altered
   if(summary_type_in == "Publications and Summary results") {
     #all entries with summary results have to be marked accordingly w.r.t. publication type
-    has_summary <- !is.na(input_table$`Days to summary CD`)
-    input_table[has_summary,]$`Publication type` <- "Registry linked"
+    input_table[input_table$has_summary_results,]$identification_step <- "Registry linked"
   } else if(summary_type_in == "Summary results (CT.gov only)") {
     #set all publication types to "No publ" exept for the cases that have a summary result
-    input_table$`Publication type` <- "No publ"
-    has_summary <- !is.na(input_table$`Days to summary CD`)
-    input_table[has_summary,]$`Publication type` <- "Registry linked"
+    input_table$identification_step <- "No publ"
+    has_summary <- !is.na(input_table$days_cd_to_summary)
+    input_table[input_table$has_summary_results,]$identification_step <- "Registry linked"
   } else {
     #do nothing if only publications are used
   }
@@ -487,10 +476,10 @@ make_table_data <- function(input_table, summary_type_in, compl_status_in, spons
   #finally add timeframe for publ.
 
   if(delayed == TRUE) {
-    input_table[["publ"]] <- input_table$days_start_to_reg > -60
+    input_table[["publ"]] <- input_table$days_reg_to_start > -60
   } else {
     #add those publ to the publ count column
-    input_table[["publ"]] <- input_table[["Publication type"]] %in% publ_type
+    input_table[["publ"]] <- input_table[["identification_step"]] %in% publ_type
     input_table[["publ"]] <- input_table[["publ"]] & (days_to_pub < (365 * years_until_publ))
 
     input_table[["publ"]][is.na(input_table[["publ"]])] <- FALSE
@@ -500,15 +489,15 @@ make_table_data <- function(input_table, summary_type_in, compl_status_in, spons
   input_table_filtered <- input_table[reg_filter,] %>%
     filter_participants(participants) %>%
     filter_followup_time(month_follow_up, compl_date_in) %>%
-    filter(is_CTgov %in% registry_status) %>%
-    filter(recruitmentStatus %in% compl_status) %>%
+    filter(registry %in% registry_sub) %>%
+    filter(recruitment_status %in% compl_status) %>%
     filter(lead_or_facility %in% sponsor_status) %>%
     filter(is_multicentric %in% multicentric) %>%
     filter(main_sponsor %in% industry) %>%
     filter(phase %in% phase_sub) %>%
     filter(intervention_type %in% intervention) %>%
     filter(completion_year %in% complyear) %>%
-    filter(IV_version %in% version)
+    filter(iv_version %in% version)
 
   table_cities <- input_table_filtered %>%
     rbind(make_basic_city_tab(input_table)) %>% #add the cities tibble to ensure that all cities are present in the results
@@ -559,7 +548,7 @@ make_table_data_delay <- function(input_table, compl_status_in, multicentric_in,
   #filter for registration timepoint & completion status and group by cities
   input_table_filtered <- input_table %>%
     filter_participants(participants) %>%
-    filter(recruitmentStatus %in% compl_status) %>%
+    filter(recruitment_status %in% compl_status) %>%
     filter(is_multicentric %in% multicentric) %>%
     filter(main_sponsor %in% industry) %>%
     filter(phase %in% phase_sub) %>%
@@ -596,12 +585,12 @@ make_table_data_delay <- function(input_table, compl_status_in, multicentric_in,
 #arranges data for display as table
 make_table <- function(input_table, summary_type_in, compl_status_in, sponsor_status_in,
                        compl_date_in, month_to_publ_in, reg_time_in, multicentric_in, industry_in, phase_sub_in,
-                       publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, version_in, delayed = FALSE)
+                       publ_type_in, registry_in, intervention_in, participants_in, complyear_in, version_in, delayed = FALSE)
 {
   #first filter data according to input options
   table_data <- make_table_data(input_table, summary_type_in, compl_status_in, sponsor_status_in,
                                 compl_date_in, month_to_publ_in, reg_time_in, multicentric_in, industry_in, phase_sub_in,
-                                publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, version_in, delayed)
+                                publ_type_in, registry_in, intervention_in, participants_in, complyear_in, version_in, delayed)
 
   table_data <- table_data %>%
     ungroup() %>%
@@ -633,12 +622,12 @@ make_table <- function(input_table, summary_type_in, compl_status_in, sponsor_st
 #arranges data for plotting
 make_plot_data <- function(input_table, summary_type_in, compl_status_in, sponsor_status_in,
                            compl_date_in, month_to_publ_in, reg_time_in, multicentric_in, industry_in, phase_sub_in,
-                           publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, version_in)
+                           publ_type_in, registry_in, intervention_in, participants_in, complyear_in, version_in)
 {
   #first filter data according to input options
   plot_data <- make_table_data(input_table, summary_type_in, compl_status_in, sponsor_status_in,
                                compl_date_in, month_to_publ_in, reg_time_in, multicentric_in, industry_in, phase_sub_in,
-                               publ_type_in, registry_status_in, intervention_in, participants_in, complyear_in, version_in)
+                               publ_type_in, registry_in, intervention_in, participants_in, complyear_in, version_in)
 
   #modifications specific for plotting
   plot_data$city <- factor(plot_data$city, levels = plot_data$city)
