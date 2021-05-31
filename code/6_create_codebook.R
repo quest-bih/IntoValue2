@@ -121,7 +121,7 @@ description <- tribble(
   "Whether summary results were posted on registry. ClinicalTrials.gov includes a structured summary results field. DRKS includes summary results with other references, and summary results were determined based on manual inspection with names such as Ergebnisbericht or Abschlussbericht.",
   
   "summary_results_date", 
-  "Date of summary results submission to registry. Derived from `results_first_submitted_date` (field previously called `first_received_results_date`). ClinicalTrials.gov only.",
+  "Date of summary results. For ClinicalTrials.gov only, date of submission to registry, derived from `results_first_submitted_date` (field previously called `first_received_results_date`). For DRKS, date included on posted summary result document.",
   
   "registration_date", 
   "Date of study submission to registry, as given on registry.",
