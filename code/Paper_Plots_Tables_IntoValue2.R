@@ -198,7 +198,7 @@ ggsave("results_for_paper/City_hist_2y.png", width = 35, height = 18, units = "c
 #we finished the publication search beginning of Dec. 2020
 #and take this as cutoff date for the timeframe 
 # THE DATE STILL HAS TO BE DISCUSSED IN THE GROUP!!!
-cutoff_date <- dmy("01.12.2020") - months(60)
+cutoff_date <- dmy("01.09.2020") - months(60)
 IntoValue_dataset_cities_5y <- IntoValue_dataset_cities %>% 
   filter(completion_date < cutoff_date) %>%
   mutate(has_publ_within_5y = has_publ_or_summary & days_to_publ < 5*365)
@@ -334,11 +334,10 @@ write_csv(city_statistics_comp, "results_for_paper/city_statistics_comp.csv")
 #--------------------------------------------------------------------------------------------------
 
 #get minimum of days to pub or to summary result & time in days that one study could be tracked
-#(end of publication search was on ???)
 IntoValue_KM_data <- IntoValue2_dataset %>%
   mutate(days_to_publ = pmin(days_cd_to_publication,   #get minimum of days to pub or to summary result
                              days_cd_to_summary, na.rm = TRUE)) %>%
-  mutate(days_obs = dmy("01.08.2020") - completion_date) #still need to discuss end date of publ search
+  mutate(days_obs = dmy("01.09.2020") - completion_date)
 
 #sort the studies according to completion years for Kaplan-Meier curve
 compl_years <- IntoValue_KM_data$completion_date %>% str_sub(1, 4)
