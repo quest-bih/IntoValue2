@@ -14,7 +14,7 @@ library(KMsurv) #for Kaplan-Meier curve
 source("app_functions.R", encoding = "UTF-8")
 
 #read in .rds output from Journal_Whitelist_script.R here
-IntoValue_app_table <- readRDS("data/IntoValue_Dataset_combined.rds")
+IntoValue_app_table <- read_csv("data/IntoValue_Dataset_combined.csv")
 delayed_registration_table <- readRDS("data/CT_gov_delayed_registration_3.rds") %>%
   rename(recruitment_status = recruitmentStatus)
 

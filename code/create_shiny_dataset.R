@@ -44,7 +44,6 @@ assert_that(dim(missing_trials)[1] == 0)
 
 
 #check that all cities have the right number of entries in the modified dataset
-assert_that(sum(city_counts_lead) ==  sum(id_occurences_lead))
 iv_lead_city_table <- iv_dataset$lead_cities %>% str_split(" ") %>% unlist() %>% table()
 iv_lead_trial_per_city_table <- iv_trials_per_lead_city$city %>% table()
 assert_that(all(iv_lead_city_table == iv_lead_trial_per_city_table))
@@ -65,3 +64,4 @@ iv_trials_per_city$city[iv_trials_per_city$city == "LMU_München"] <- "LMU Münc
 
 
 write_rds(iv_trials_per_city, "shiny_app/data/IntoValue_Dataset_combined.rds")
+write_csv(iv_trials_per_city, "shiny_app/data/IntoValue_Dataset_combined.csv")
