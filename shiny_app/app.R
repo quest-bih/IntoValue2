@@ -43,17 +43,22 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                      h1("IntoValue - Institutions’ contribution to increasing value and reducing waste", align = "center"),
                                      h4("Clinical trial dissemination rates of all German university medical centers", align = "center"),
                                      br(),
-                                     h5(HTML(paste0("The following Shiny app accompanies the publication ",
+                                     h5(HTML(paste0("The following Shiny app accompanies the two publications ",
                                                     a(href = 'http://biorxiv.org/cgi/content/short/467746v1',
                                                       "'Benchmarking university medical centres for responsible metrics. A cross sectional study
-                                                        on timely results dissemination across 36 German centres'"), " on the clinical trial
+                                                        on timely results dissemination across 36 German centres'"), " and ",
+                                                    a(href = '...',
+                                                      "'Result dissemination from clinical trials conducted at German university medical centers 
+                                                      remains delayed and incomplete. The 2014-2017 cohort'"), " on the clinical trial
                                                         dissemination rates of all German university medical centers and allows to further explore the results.
                                                         It allows to interactively choose different subsets of the data and allows for different
                                                         ways of counting timely publication. The results can be displayed both as diagram or in a table
                                                         (see navigation bar at the top). Additionally, a Kaplan-Meier curve for the percentage of
                                                         unpublished studies over time can be displayed for different subgroups of the data as well
                                                         as different stratifying variables. The dataset, analysis code, as well as detailed methods
-                                                        can be found on the ", a(href = 'https://osf.io/fh426/', "OSF project page"),
+                                                        can be found on the OSF project pages for the ", a(href = 'https://osf.io/fh426/', "first"),
+                                                        " and the ", a(href = 'https://osf.io/98j7u/', "second"), " study. The combined dataset
+                                                        for both studies can be found ", a(href = '...', "here"), 
                                                     "."))),
 
                                      br(),
@@ -77,7 +82,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                               ),
                                               wellPanel(
                                                 h4("Different subgroups"),
-                                                selectInput('version', 'Study version', c("Any", "IntoValue1", "IntoValue2")),
+                                                selectInput('version', 'Study version*', c("Any", "IntoValue1", "IntoValue2")),
                                                 selectInput('registry', 'Registry', c("CT.gov + DRKS", "CT.gov", "DRKS")),
                                                 selectInput('status', 'Completion status', c("Any status", "Completed", "Terminated", "Unknown status", "Suspended")),
                                                 selectInput('sponsor', 'Responsibility level', c("Lead or Facility", "Lead trials only", "Facility trials only"), selected = "Lead trials only"),
@@ -93,7 +98,12 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                                 selectInput('complyear', 'Completion year', c("Any", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017")),
                                                 helpText('There are many choices on which group of clinical trials to consider. All of these choices
                                           alter the results for the final publication rates. Only the trials in our dataset that match the set filter criteria
-                                                           are considered for the calculation of the timely reporting percentage.')
+                                                           are considered for the calculation of the timely reporting percentage.'),
+                                                helpText('*There are 128 trials that are part of the samples used for both studies. 
+                                              The reason for this is either a change in the completion date in the registry after the
+                                              end of the IntoValue1 study or the change in the search criteria from primary completion date (IntoValue1)
+                                              to completion date (IntoValue2). In those cases the results from the second study are shown
+                                              when "Any" or "IntoValue2" is chosen. When "IntoValue1" is chosen, the results from the first study are shown.')
                                               ),
                                               wellPanel(
                                                 h4(HTML(paste0("This Shiny app is hosted by"))),
@@ -200,7 +210,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                    ),
                                    wellPanel(
                                      h4("Different subgroups"),
-                                     selectInput('tab_version', 'Study version', c("Any", "IntoValue1", "IntoValue2")),
+                                     selectInput('tab_version', 'Study version*', c("Any", "IntoValue1", "IntoValue2")),
                                      selectInput('tab_registry', 'Registry', c("CT.gov + DRKS", "CT.gov", "DRKS")),
                                      selectInput('tab_status', 'Completion status', c("Any status", "Completed", "Terminated", "Unknown status", "Suspended")),
                                      selectInput('tab_sponsor', 'Responsibility level', c("Lead or Facility", "Lead trials only", "Facility trials only"), selected = "Lead trials only"),
@@ -216,7 +226,12 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                      selectInput('tab_complyear', 'Completion year', c("Any", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017")),
                                      helpText('There are many choices on which group of clinical trials to consider. All of these choices
                                         alter the results for the final publication rates. Only the trials in our dataset that match the set filter criteria
-                                                           are considered for the calculation of the timely reporting percentage.')
+                                                           are considered for the calculation of the timely reporting percentage.'),
+                                     helpText('*There are 128 trials that are part of the samples used for both studies. 
+                                              The reason for this is either a change in the completion date in the registry after the
+                                              end of the IntoValue1 study or the change in the search criteria from primary completion date (IntoValue1)
+                                              to completion date (IntoValue2). In those cases the results from the second study are shown
+                                              when "Any" or "IntoValue2" is chosen. When "IntoValue1" is chosen, the results from the first study are shown.')
                                    ),
                                    wellPanel(
                                      h4(HTML(paste0("This Shiny app is hosted by"))),
