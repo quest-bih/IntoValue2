@@ -315,13 +315,15 @@ set_phase_status <- function(phase_sub_in) {
 set_reg_time <- function(reg_time_in, input_table) {
   switch(reg_time_in,
          "Any" = {reg_filter <- rep(TRUE, length(input_table$days_reg_to_start))},
-         "Before trail start" = {reg_filter <- input_table$days_reg_to_start >= 0},
-         "After trial start" = {reg_filter <- input_table$days_reg_to_start < 0},
-         "21 days after trial start" = {reg_filter <- input_table$days_reg_to_start < -21},
-         "60 days after trial start" = {reg_filter <- input_table$days_reg_to_start < -60},
-         "After trial completion (CD)" = {reg_filter <- input_table$days_CD_to_reg < 0},
-         "After trial completion (PCD)" = {reg_filter <- input_table$days_PCD_to_reg < 0},
-         "After publication" = {reg_filter <- input_table$days_publ_to_reg < 0}
+         "In the month of the trial start or earlier" = {
+           reg_filter <- floor_date(input_table$start_date, unit = "month") >= 
+             floor_date(input_table$registration_date, unit = "month")},
+         "After the month of the trial start" = {
+           reg_filter <- floor_date(input_table$start_date, unit = "month") <
+             floor_date(input_table$registration_date, unit = "month")},
+         "After trial completion (CD)" = {reg_filter <- input_table$days_reg_to_cd < 0},
+         "After trial completion (PCD)" = {reg_filter <- input_table$days_reg_to_pcd < 0},
+         "After publication" = {reg_filter <- input_table$days_reg_to_publication < 0}
   )
 
   return(reg_filter)
