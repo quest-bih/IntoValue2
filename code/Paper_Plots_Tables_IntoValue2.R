@@ -253,6 +253,13 @@ summary_result_num <- sum(CTgov_trials$days_cd_to_summary < 2*365, na.rm = TRUE)
 perc_summary <- summary_result_num/CTgov_trial_num
 
 
+#calculate how many timely publication via journal, summary result, dissertation
+timely_pub_num <- sum(IntoValue2_dataset$days_cd_to_publication < 2*365, na.rm = TRUE)
+timely_sum_num <- sum(IntoValue2_dataset$days_cd_to_summary < 2*365, na.rm = TRUE)
+timely_pub_and_sum_num <- sum((IntoValue2_dataset$days_cd_to_summary < 2*365) & 
+                        (IntoValue2_dataset$days_cd_to_publication < 2*365), na.rm = TRUE)
+
+
 #check how many of the trials from IV1 now have summary results
 
 #the AACT dataset has to be downloaded first from https://aact.ctti-clinicaltrials.org/pipe_files
@@ -322,9 +329,12 @@ city_statistics_old <- do.call(rbind, city_statistics_old) %>%
 city_statistics_comp <- city_statistics_lead %>% 
   left_join(city_statistics_old, by = "City") %>%
   mutate(percentage_diff = Percentage - percentage_IntoValue1) %>%
-  select(-fill_col)
+  arrange(desc(Percentage)) %>% 
+  select(City, trials_IntoValue1, timely_published_IntoValue1, percentage_IntoValue1,
+         Trials, `Published <24m after CD`, Percentage, percentage_diff)
 city_statistics_comp$percentage_IntoValue1 <- city_statistics_comp$percentage_IntoValue1 %>% round(2)
 city_statistics_comp$percentage_diff <- city_statistics_comp$percentage_diff %>% round(2)
+
 write_csv(city_statistics_comp, "results_for_paper/city_statistics_comp.csv")
 
 
@@ -414,9 +424,9 @@ ggplot(cum_dist_years, aes(x = months, y = fraction, color = category)) +
   theme_minimal() +
   xlab("Months") + ylab("Unpublished studies (%)") +
   scale_color_brewer(name = "Completion\nYear" , palette = 'Dark2') +
-  theme(text = element_text(size=16),
-        axis.text.x = element_text(size=16),
-        axis.text.y = element_text(size=16)) +
+  theme(text = element_text(size=18),
+        axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18)) +
   scale_x_continuous(name = "Months", breaks=c(0, year_range)*12,
                      labels = paste0(c(0, year_range)*12, "")) +
   scale_y_continuous(labels = scales::percent,
