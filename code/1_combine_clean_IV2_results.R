@@ -206,8 +206,7 @@ intovalue2_results <- intovalue2_results %>%
   publication_DOI = str_remove(publication_DOI, "\\.$"),
   publication_DOI = str_remove(publication_DOI, "https?://(dx\\.)?doi.org/"),
   publication_DOI = str_remove(publication_DOI, "(?i)^doi\\s*"),
-  publication_DOI = tolower(publication_DOI),
-  publication_URL = tolower(publication_URL)
+  publication_DOI = tolower(publication_DOI)
   )
 
 

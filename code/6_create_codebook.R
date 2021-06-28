@@ -53,6 +53,7 @@ codebook <-
   mutate(levels = case_when(
     name == "registry" ~ get_levels(registry),
     name == "identification_step" ~ get_levels(identification_step),
+    name == "publication_type" ~ get_levels(publication_type),
     name == "recruitment_status" ~ get_levels(recruitment_status),
     name == "phase" ~ get_levels(phase),
     name == "main_sponsor" ~ get_levels(main_sponsor),
@@ -113,6 +114,9 @@ description <- tribble(
   
   "identification_step", 
   "Manual publication search identification steps. Both versions include: No publ; Registry linked. Version 1 also includes: Pubmed; Hand search (= Publication found via Google search); Abstract only; Dissertation. Version 2 also includes: Publ found in Google ID search; Publ found in Google search (no ID). In version 2, abstracts only were not included, whereas dissertations were included.",
+  
+  "publication_type", 
+  "Type of identified publication. Can be journal publication or dissertation.",
   
   "is_prospective", 
   "Whether trial was prospectively registered. Derived from `registration_date` and `start_date`. Trial is considered prospectively registered if registered in the same or previous months to start date.",

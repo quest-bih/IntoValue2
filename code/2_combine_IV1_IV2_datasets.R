@@ -212,7 +212,29 @@ IntoValue_datasets_comb <-
   ) %>%
   
   #convert is_ctgov to registry
-  mutate(registry = if_else(is_CTgov, "ClinicalTrials.gov", "DRKS"), .keep = "unused")
+  mutate(registry = if_else(is_CTgov, "ClinicalTrials.gov", "DRKS"), .keep = "unused") %>%
+  
+  #add column on type of results (publication, disseration, summary results)
+  mutate(
+    publication_type = case_when(
+      has_publication ~ "journal publication"
+    ),
+    publication_type = if_else(
+      (id %in% c("NCT02685696", "NCT01605487", "NCT02517801", "NCT02919527", 
+                "NCT02554318", "NCT02494830", "NCT01148264", "NCT02297334", 
+                "NCT02912598", "NCT02126852", "NCT02964520", "DRKS00005943", 
+                "DRKS00005224", "DRKS00009221", "DRKS00010782", "DRKS00005108", 
+                "DRKS00010695", "DRKS00003691", "DRKS00005120", "DRKS00013254", 
+                "DRKS00006093", "DRKS00011332")) & iv_version == 2,
+      "dissertation", publication_type
+    ),
+    publication_type = if_else(
+      (id %in% c("NCT00450684", "NCT00687050", "NCT01575704", "NCT01631799",
+                 "NCT01673763", "NCT01908244")) & iv_version == 1,
+      "dissertation", publication_type
+    ),
+  )
+
 
 
 #manually re-sort columns by topic
@@ -223,6 +245,7 @@ IntoValue_datasets_comb <- IntoValue_datasets_comb %>%
          publication_pmid = publication_PMID, 
          publication_url = publication_URL,
          publication_date, identification_step,
+         publication_type,
          is_prospective,
          has_summary_results, summary_results_date,
          registration_date, start_date, 
