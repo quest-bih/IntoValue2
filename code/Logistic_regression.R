@@ -73,37 +73,6 @@ IntoValue_studies <- IntoValue_studies %>%
     ifelse(x %>% str_detect(large_centers) %>% any(), "large", "small")))
 
 
-#different publication rates for the categories detected in the logistic regression model
-recruitment_status_publ_rates <- IntoValue_studies %>% 
-  group_by(recruitment_status, timely_publication) %>% 
-  summarise(count = n())
-
-completed_pub_rate <- recruitment_status_publ_rates$count[2]/sum(recruitment_status_publ_rates$count[1:2])
-other_pub_rate <- recruitment_status_publ_rates$count[4]/sum(recruitment_status_publ_rates$count[3:4])
-completed_pub_rate
-other_pub_rate
-
-
-multicentric_publ_rates <- IntoValue_studies %>% 
-  group_by(is_multicentric, timely_publication) %>% 
-  summarise(count = n())
-
-monocentric_pub_rate <- multicentric_publ_rates$count[2]/sum(multicentric_publ_rates$count[1:2])
-multicentric_pub_rate <- multicentric_publ_rates$count[4]/sum(multicentric_publ_rates$count[3:4])
-monocentric_pub_rate
-multicentric_pub_rate
-
-
-compl_year_publ_rates <- IntoValue_studies %>% 
-  group_by(completion_year, timely_publication) %>% 
-  summarise(count = n())
-compl_year_publ_num <- compl_year_publ_rates$count[seq(2, length(compl_year_publ_rates$count), 2)]
-compl_year_unpubl_num <- compl_year_publ_rates$count[seq(1, length(compl_year_publ_rates$count), 2)]
-compl_year_total_num <- compl_year_publ_num + compl_year_unpubl_num
-compl_year_publ_rate <- compl_year_publ_num/compl_year_total_num
-compl_year_publ_rate
-
-
 #----------------------------------------------------------------------------------------------------------------------
 #  fit logistic regression models
 #----------------------------------------------------------------------------------------------------------------------
@@ -163,7 +132,6 @@ min_model <- which.min(comparison_1_summary$aic)
 
 
 
-
 #second step, adding the next explanatory variable
 models_2 = list(m0 = glm(timely_publication ~ recruitment_status, family = binomial(),data=IntoValue_studies),
                 m1 = glm(timely_publication ~ recruitment_status + medication, family = binomial(),data=IntoValue_studies),
@@ -182,6 +150,10 @@ aic <- models_2[2:8]  %>% map_dbl(function(x) x$aic)
 #multiple comparison correction of p_values with Holm-Bonferroni
 p_val <- p.adjust(p_val, method = "bonferroni")
 comparison_2_summary <- as_tibble(cbind(log_lik,chisq,p_val,aic))
+
+
+models_2_summary <- map(models_2, summary)
+names(models_2_summary) <- names(models_2)
 
 #model with the lowest likelihood in second step: main_sponsor (industry/academic)
 min_model_2 <- which.min(comparison_2_summary$aic)
@@ -211,10 +183,42 @@ comparison_3_summary <- as_tibble(cbind(log_lik,chisq,p_val,aic))
 min_model_3 <- which.max(comparison_3_summary$log_lik)
 
 
-
-
 #calculate the area under the curve for the final model
 prob <- predict(models_3$m0,type=c("response"))
 roc_curve <- roc(IntoValue_studies$timely_publication, prob, ci = TRUE)
+
+
+#----------------------------------------------------------------------------------------------------------------------
+#  different publication rates for the categories detected in the logistic regression model
+#----------------------------------------------------------------------------------------------------------------------
+
+recruitment_status_publ_rates <- IntoValue_studies %>% 
+  group_by(recruitment_status, timely_publication) %>% 
+  summarise(count = n())
+
+completed_pub_rate <- recruitment_status_publ_rates$count[2]/sum(recruitment_status_publ_rates$count[1:2])
+other_pub_rate <- recruitment_status_publ_rates$count[4]/sum(recruitment_status_publ_rates$count[3:4])
+completed_pub_rate
+other_pub_rate
+
+
+multicentric_publ_rates <- IntoValue_studies %>% 
+  group_by(is_multicentric, timely_publication) %>% 
+  summarise(count = n())
+
+monocentric_pub_rate <- multicentric_publ_rates$count[2]/sum(multicentric_publ_rates$count[1:2])
+multicentric_pub_rate <- multicentric_publ_rates$count[4]/sum(multicentric_publ_rates$count[3:4])
+monocentric_pub_rate
+multicentric_pub_rate
+
+
+compl_year_publ_rates <- IntoValue_studies %>% 
+  group_by(completion_year, timely_publication) %>% 
+  summarise(count = n())
+compl_year_publ_num <- compl_year_publ_rates$count[seq(2, length(compl_year_publ_rates$count), 2)]
+compl_year_unpubl_num <- compl_year_publ_rates$count[seq(1, length(compl_year_publ_rates$count), 2)]
+compl_year_total_num <- compl_year_publ_num + compl_year_unpubl_num
+compl_year_publ_rate <- compl_year_publ_num/compl_year_total_num
+compl_year_publ_rate
 
 
