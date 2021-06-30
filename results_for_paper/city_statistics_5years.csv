@@ -1,4 +1,4 @@
-City,Trials,Published <60m after CD,Percentage
+city,trials,publ_within_60m_after_CD,percentage
 Aachen,21,13,61.9
 All,635,447,70.4
 Berlin,74,55,74.3

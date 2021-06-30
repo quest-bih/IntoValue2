@@ -1,4 +1,4 @@
-City,trials_IntoValue1,timely_published_IntoValue1,percentage_IntoValue1,Trials,Published <24m after CD,Percentage,percentage_diff
+city,trials_IntoValue1,timely_published_IntoValue1,percentage_IntoValue1,trials_IntoValue2,timely_published_IntoValue2,percentage_IntoValue2,percentage_diff
 Giessen,26,7,26.9,17,12,70.6,43.7
 Ulm,35,16,45.7,47,27,57.4,11.7
 Hannover,65,26,40,46,25,54.3,14.3
