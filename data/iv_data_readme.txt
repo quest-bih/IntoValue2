@@ -8,8 +8,8 @@ DRKS data were searched and downloaded as CSVs from the DRKS website (https://ww
 
 These data were generated and used for two publications (Wieschowski et al., 2019; Riedel et al. 2021) and therefore comprises two versions (indicated as `iv_version`).
 
-For version 1, registry data was collected on [@Nico date, or if different dates for ctgov and drks, split up] and was limited to trials with a completion date on DRKS and primary completion date on ClinicalTrials.gov between 2009 and 2013. Version 1 manual searches for results publications were conducted from [@Nico date] to [@Nico date].
-For version 2, registry data was collected on [@Nico date, or if different dates for ctgov and drks, split up] and was limited to trials ith a completion date on DRKS and ClinicalTrials.gov between 2014 and 2017. Version 2 manual searches for results publications were conducted from [@Nico date] to [@Nico date].
+For version 1, registry data was collected on [@Nico date, or if different dates for ctgov and drks, split up] and was limited to trials with a completion date on DRKS and primary completion date on ClinicalTrials.gov between 2009 and 2013. Version 1 manual searches for results publications were conducted from 2017-07-01 to 2017-12-01.
+For version 2, registry data was collected on [@Nico date, or if different dates for ctgov and drks, split up] and was limited to trials ith a completion date on DRKS and ClinicalTrials.gov between 2014 and 2017. Version 2 manual searches for results publications were conducted from 2020-07-01 to 2020-09-01.
 
 Publication identifiers (DOI, PMID, URL) were manually entered during the publication search and then further enhanced using the API of Internet Archive's open-source Fatcat catalog of research publications, to add PMIDs based on DOIs, and viceversa.
 
