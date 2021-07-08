@@ -303,6 +303,14 @@ intovalue_clean <-
     days_pcd_to_summary = as.numeric(summary_results_date - primary_completion_date)
   ) %>% 
   
+  # correct the publication_type column after some of the has_publication entries have changed
+  mutate(
+    publication_type = case_when(
+      has_publication == FALSE ~ NA_character_,
+      TRUE ~ publication_type
+    )
+  ) %>%
+  
   # Rearrange rows
   arrange(iv_version, desc(has_publication))
 
