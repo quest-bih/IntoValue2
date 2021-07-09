@@ -394,13 +394,17 @@ enrollment_unpublished <- unpublished_trials_5y$enrollment %>% sum(na.rm = TRUE)
 print(paste0("number of participants in trials that did not publish results within 5 years: ", enrollment_unpublished))
 
 
-#calculate how many summary results are published within 24 months
+#calculate how many summary results are published within 12 and 24 months
 CTgov_trials <- IntoValue_dataset_cities %>% 
   filter(registry == "ClinicalTrials.gov")
 CTgov_trial_num <- dim(CTgov_trials)[1]
-summary_result_num <- sum(CTgov_trials$days_cd_to_summary < 2*365, na.rm = TRUE)
-perc_summary <- summary_result_num/CTgov_trial_num
-print(paste0("number of CT.gov trials with summary results publication within 24 month: ", summary_result_num))
+summary_result_num_12months <- sum(CTgov_trials$days_cd_to_summary <= 1*365, na.rm = TRUE)
+perc_summary_12months <- summary_result_num_12months/CTgov_trial_num
+print(paste0("number of CT.gov trials with summary results publication within 12 month: ", summary_result_num_12months))
+
+summary_result_num_24months <- sum(CTgov_trials$days_cd_to_summary <= 2*365, na.rm = TRUE)
+perc_summary_24months <- summary_result_num_24months/CTgov_trial_num
+print(paste0("number of CT.gov trials with summary results publication within 24 month: ", summary_result_num_24months))
 
 
 #calculate how many timely publication via journal, summary result, dissertation
