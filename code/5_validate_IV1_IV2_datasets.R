@@ -46,6 +46,7 @@ intovalue %>%
   
   # Check that all trials with has_publication == FALSE have publication_type == NA
   assertr::verify(nrow(filter(., !has_publication & !is.na(publication_type))) == 0) %>%
+  assertr::verify(nrow(filter(., has_publication & is.na(publication_type))) == 0) %>%
   
   # Check that if identification_step is no publication or abstract only, not has_publication
   pointblank::col_vals_equal(

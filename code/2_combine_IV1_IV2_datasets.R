@@ -230,11 +230,14 @@ IntoValue_datasets_comb <-
     ),
     publication_type = if_else(
       (id %in% c("NCT00450684", "NCT00687050", "NCT01575704", "NCT01631799",
-                 "NCT01673763", "NCT01908244")) & iv_version == 1,
+                 "NCT01673763", "NCT01908244", "NCT00742495")) & iv_version == 1,
       "dissertation", publication_type
     ),
+    publication_type = if_else(
+      (id %in% c("NCT00806663", "NCT01168791", "DRKS00003240")) & iv_version == 1,
+      "journal publication", publication_type
+    ),
   )
-
 
 
 #manually re-sort columns by topic
