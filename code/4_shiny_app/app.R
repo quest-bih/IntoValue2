@@ -39,21 +39,24 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                      h1("IntoValue - Institutions’ contribution to increasing value and reducing waste", align = "center"),
                                      h4("Clinical trial dissemination rates of all German university medical centers", align = "center"),
                                      br(),
-                                     h5(HTML(paste0("The following Shiny app accompanies the two publications ",
+                                     h5(HTML(paste0("The following Shiny app accompanies the two publications 
+                                                    on the clinical trial dissemination rates of all German 
+                                                    university medical centers and allows to further explore the results.
+                                                    The publications are ",
                                                     a(href = 'http://biorxiv.org/cgi/content/short/467746v1',
-                                                      "'Benchmarking university medical centres for responsible metrics. A cross sectional study
-                                                        on timely results dissemination across 36 German centres'"), " and ",
+                                                      "'Result dissemination from clinical trials conducted at German university 
+                                                      medical centers was delayed and incomplete'"), " and ",
                                                     a(href = '...',
-                                                      "'Result dissemination from clinical trials conducted at German university medical centers 
-                                                      remains delayed and incomplete. The 2014-2017 cohort'"), " on the clinical trial
-                                                        dissemination rates of all German university medical centers and allows to further explore the results.
-                                                        It allows to interactively choose different subsets of the data and allows for different
-                                                        ways of counting timely publication. The results can be displayed both as diagram or in a table
+                                                      "'Results dissemination from completed clinical trials conducted at German 
+                                                      university medical centers remains delayed and incomplete. The 2014-2017 cohort'"), 
+                                                      ". You can interactively choose different subsets of the data and different
+                                                        ways of defining timely publication. The results can be displayed both as diagram or in a table
                                                         (see navigation bar at the top). Additionally, a Kaplan-Meier curve for the percentage of
                                                         unpublished studies over time can be displayed for different subgroups of the data as well
                                                         as different stratifying variables. The dataset, analysis code, as well as detailed methods
                                                         can be found on the OSF project pages for the ", a(href = 'https://osf.io/fh426/', "first"),
-                                                        " and the ", a(href = 'https://osf.io/98j7u/', "second"), " study. The combined dataset
+                                                        " and the ", a(href = 'https://osf.io/98j7u/', "second"), " study and ", 
+                                                        a(href = 'https://github.com/quest-bih/IntoValue2', "this"), " Github repository. The combined dataset
                                                         for both studies can be found ", a(href = '...', "here"), 
                                                     "."))),
 
@@ -116,17 +119,25 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                      h1("IntoValue - Institutions’ contribution to increasing value and reducing waste", align = "center"),
                                      h4("Clinical trial dissemination rates of all German university medical centers", align = "center"),
                                      br(),
-                                     h5(HTML(paste0("The following Shiny app accompanies the publication ",
+                                     h5(HTML(paste0("The following Shiny app accompanies the two publications 
+                                                    on the clinical trial dissemination rates of all German 
+                                                    university medical centers and allows to further explore the results.
+                                                    The publications are ",
                                                     a(href = 'http://biorxiv.org/cgi/content/short/467746v1',
-                                                      "'Benchmarking university medical centres for responsible metrics. A cross sectional study
-                                           on timely results dissemination across 36 German centres'"), " on the clinical trial
-                                         dissemination rates of all German university medical centers and allows to further explore the results.
-                                         It allows to interactively choose different subsets of the data and allows for different
-                                         ways of counting timely publication. The results can be displayed both as diagram or in a table
-                                         (see navigation bar at the top). Additionally, a Kaplan-Meier curve for the percentage of
-                                         unpublished studies over time can be displayed for different subgroups of the data as well
-                                         as different stratifying variables. The dataset, analysis code, as well as detailed methods
-                                         can be found on the ", a(href = 'https://osf.io/fh426/', "OSF project page"),
+                                                      "'Result dissemination from clinical trials conducted at German university 
+                                                      medical centers was delayed and incomplete'"), " and ",
+                                                    a(href = '...',
+                                                      "'Results dissemination from completed clinical trials conducted at German 
+                                                      university medical centers remains delayed and incomplete. The 2014-2017 cohort'"), 
+                                                    ". You can interactively choose different subsets of the data and different
+                                                        ways of defining timely publication. The results can be displayed both as diagram or in a table
+                                                        (see navigation bar at the top). Additionally, a Kaplan-Meier curve for the percentage of
+                                                        unpublished studies over time can be displayed for different subgroups of the data as well
+                                                        as different stratifying variables. The dataset, analysis code, as well as detailed methods
+                                                        can be found on the OSF project pages for the ", a(href = 'https://osf.io/fh426/', "first"),
+                                                    " and the ", a(href = 'https://osf.io/98j7u/', "second"), " study and ", 
+                                                    a(href = 'https://github.com/quest-bih/IntoValue2', "this"), " Github repository. The combined dataset
+                                                        for both studies can be found ", a(href = '...', "here"), 
                                                     "."))),
 
                                      br(),
@@ -136,7 +147,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                                 h4('Prospective registration'),
                                                 helpText('This graph shows the percentage of trials with timely registration. The underlying
                                               data set consists of all trials registered on ClinicalTrials.gov between 2006 and 2018
-                                              that have one of the German university medical centres in the lead. Registration is
+                                              that have one of the German university medical centers in the lead. Registration is
                                               is considered timely if the registration date on the registry is not more than
                                               60 days after the given study start. As on ClinicalTrials.gov only the month
                                               is given for the study start date, but an exact date for the registration date,
@@ -173,17 +184,25 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                           h1("IntoValue - Institutions’ contribution to increasing value and reducing waste", align = "center"),
                           h4("Clinical trial dissemination rates of all German university medical centers", align = "center"),
                           br(),
-                          h5(HTML(paste0("The following Shiny app accompanies the publication ",
+                          h5(HTML(paste0("The following Shiny app accompanies the two publications 
+                                                    on the clinical trial dissemination rates of all German 
+                                                    university medical centers and allows to further explore the results.
+                                                    The publications are ",
                                          a(href = 'http://biorxiv.org/cgi/content/short/467746v1',
-                                           "'Benchmarking university medical centres for responsible metrics. A cross sectional study
-                              on timely results dissemination across 36 German centres'"), " on the clinical trial
-                              dissemination rates of all German university medical centers and allows to further explore the results.
-                              It allows to interactively choose different subsets of the data and allows for different
-                              ways of counting timely publication. The results can be displayed both as diagram or in a table
-                              (see navigation bar at the top). Additionally, a Kaplan-Meier curve for the percentage of
-                              unpublished studies over time can be displayed for different subgroups of the data as well
-                              as different stratifying variables. The dataset, analysis code, as well as detailed methods
-                              can be found on the ", a(href = 'https://osf.io/fh426/', "OSF project page"),
+                                           "'Result dissemination from clinical trials conducted at German university 
+                                                      medical centers was delayed and incomplete'"), " and ",
+                                         a(href = '...',
+                                           "'Results dissemination from completed clinical trials conducted at German 
+                                                      university medical centers remains delayed and incomplete. The 2014-2017 cohort'"), 
+                                         ". You can interactively choose different subsets of the data and different
+                                                        ways of defining timely publication. The results can be displayed both as diagram or in a table
+                                                        (see navigation bar at the top). Additionally, a Kaplan-Meier curve for the percentage of
+                                                        unpublished studies over time can be displayed for different subgroups of the data as well
+                                                        as different stratifying variables. The dataset, analysis code, as well as detailed methods
+                                                        can be found on the OSF project pages for the ", a(href = 'https://osf.io/fh426/', "first"),
+                                         " and the ", a(href = 'https://osf.io/98j7u/', "second"), " study and ", 
+                                         a(href = 'https://github.com/quest-bih/IntoValue2', "this"), " Github repository. The combined dataset
+                                                        for both studies can be found ", a(href = '...', "here"), 
                                          "."))),
                           br(),
                           fluidRow(
@@ -244,17 +263,25 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                           h1("IntoValue - Institutions’ contribution to increasing value and reducing waste", align = "center"),
                           h4("Clinical trial dissemination rates of all German university medical centers", align = "center"),
                           br(),
-                          h5(HTML(paste0("The following Shiny app accompanies the publication ",
+                          h5(HTML(paste0("The following Shiny app accompanies the two publications 
+                                                    on the clinical trial dissemination rates of all German 
+                                                    university medical centers and allows to further explore the results.
+                                                    The publications are ",
                                          a(href = 'http://biorxiv.org/cgi/content/short/467746v1',
-                                           "'Benchmarking university medical centres for responsible metrics. A cross sectional study
-                                           on timely results dissemination across 36 German centres'"), " on the clinical trial
-                                         dissemination rates of all German university medical centers and allows to further explore the results.
-                                         It allows to interactively choose different subsets of the data and allows for different
-                                         ways of counting timely publication. The results can be displayed both as diagram or in a table
-                                         (see navigation bar at the top). Additionally, a Kaplan-Meier curve for the percentage of
-                                         unpublished studies over time can be displayed for different subgroups of the data as well
-                                         as different stratifying variables. The dataset, analysis code, as well as detailed methods
-                                         can be found on the ", a(href = 'https://osf.io/fh426/', "OSF project page"),
+                                           "'Result dissemination from clinical trials conducted at German university 
+                                                      medical centers was delayed and incomplete'"), " and ",
+                                         a(href = '...',
+                                           "'Results dissemination from completed clinical trials conducted at German 
+                                                      university medical centers remains delayed and incomplete. The 2014-2017 cohort'"), 
+                                         ". You can interactively choose different subsets of the data and different
+                                                        ways of defining timely publication. The results can be displayed both as diagram or in a table
+                                                        (see navigation bar at the top). Additionally, a Kaplan-Meier curve for the percentage of
+                                                        unpublished studies over time can be displayed for different subgroups of the data as well
+                                                        as different stratifying variables. The dataset, analysis code, as well as detailed methods
+                                                        can be found on the OSF project pages for the ", a(href = 'https://osf.io/fh426/', "first"),
+                                         " and the ", a(href = 'https://osf.io/98j7u/', "second"), " study and ", 
+                                         a(href = 'https://github.com/quest-bih/IntoValue2', "this"), " Github repository. The combined dataset
+                                                        for both studies can be found ", a(href = '...', "here"), 
                                          "."))),
                           br(),
                           fluidRow(
