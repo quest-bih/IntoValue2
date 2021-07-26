@@ -14,20 +14,20 @@ select_rows <- function(dataset)
   return(dataset_filtered)
 }
 
-CTgov_original <- read_delim("./manual_check/results/double_check_results/double_check_CTgov_original_results_IRR1.csv", delim = ";") %>%
+CTgov_original <- read_delim("data/2_dataset_cleaning/manual_check_results/double_check/double_check_CTgov_original_results_IRR1.csv", delim = ";") %>%
   rename(publ_identified_orig = `Publication identified in which step`,
          publication_date_orig = publication_date) %>%
   select(ID, publ_identified_orig, publication_date_orig)
-CTgov_DC <- read_delim("./manual_check/results/double_check_results/double_check_CTgov_results_IRR1.csv", delim = ";") %>%
+CTgov_DC <- read_delim("data/2_dataset_cleaning/manual_check_results/double_check/double_check_CTgov_results_IRR1.csv", delim = ";") %>%
   rename(publ_identified_DC = `Publication identified in which step`,
          publication_date_DC = publication_date) %>%
   select(ID, publ_identified_DC, publication_date_DC)
 
-DRKS_original <- read_delim("./manual_check/results/double_check_results/double_check_DRKS_original_results_IRR1.csv", delim = ";") %>%
+DRKS_original <- read_delim("data/2_dataset_cleaning/manual_check_results/double_check/double_check_DRKS_original_results_IRR1.csv", delim = ";") %>%
   rename(publ_identified_orig = `Publication identified in which step`,
          publication_date_orig = publication_date) %>%
   select(ID, publ_identified_orig, publication_date_orig)
-DRKS_DC <- read_delim("./manual_check/results/double_check_results/double_check_DRKS_results_IRR1.csv", delim = ";") %>%
+DRKS_DC <- read_delim("data/2_dataset_cleaning/manual_check_results/double_check/double_check_DRKS_results_IRR1.csv", delim = ";") %>%
   rename(publ_identified_DC = `Publication identified in which step`,
          publication_date_DC = publication_date) %>%
   select(ID, publ_identified_DC, publication_date_DC)
@@ -54,7 +54,7 @@ IRR1
 # IRR 2
 #--------------------------------------------------------------------------------------------------------
 
-CTgov_original <- read_delim("./manual_check/results/double_check_results/double_check_CTgov_original_results_IRR2+3.csv", delim = ",") %>%
+CTgov_original <- read_delim("data/2_dataset_cleaning/manual_check_results/double_check/double_check_CTgov_original_results_IRR2+3.csv", delim = ",") %>%
   rename(publ_identified_orig = `Publication identified in which step`,
          publication_date_orig = publication_date,
          article_yes_no_orig = article_yes_no,
@@ -68,7 +68,7 @@ CTgov_original <- read_delim("./manual_check/results/double_check_results/double
          publication_DOI_orig, publication_URL_orig, unsure_about_publ_yes_no_orig,
          reason_orig, other_comments_orig, reason_orig, rater_orig)
 
-CTgov_DC <- read_delim("./manual_check/results/double_check_results/double_check_CTgov_results_IRR2+3.csv", delim = ",") %>%
+CTgov_DC <- read_delim("data/2_dataset_cleaning/manual_check_results/double_check/double_check_CTgov_results_IRR2+3.csv", delim = ",") %>%
   rename(publ_identified_DC = `Publication identified in which step`,
          publication_date_DC = publication_date,
          article_yes_no_DC = article_yes_no,
@@ -82,7 +82,7 @@ CTgov_DC <- read_delim("./manual_check/results/double_check_results/double_check
          publication_DOI_DC, publication_URL_DC, unsure_about_publ_yes_no_DC,
          reason_DC, other_comments_DC, reason_DC, rater_DC)
 
-DRKS_original <- read_delim("./manual_check/results/double_check_results/double_check_DRKS_original_results_IRR2+3.csv", delim = ",") %>%
+DRKS_original <- read_delim("data/2_dataset_cleaning/manual_check_results/double_check/double_check_DRKS_original_results_IRR2+3.csv", delim = ",") %>%
   rename(publ_identified_orig = `Publication identified in which step`,
          publication_date_orig = publication_date,
          article_yes_no_orig = article_yes_no,
@@ -96,7 +96,7 @@ DRKS_original <- read_delim("./manual_check/results/double_check_results/double_
          publication_DOI_orig, publication_URL_orig, unsure_about_publ_yes_no_orig,
          reason_orig, other_comments_orig, reason_orig, rater_orig)
 
-DRKS_DC <- read_delim("./manual_check/results/double_check_results/double_check_DRKS_results_IRR2+3.csv", delim = ",") %>%
+DRKS_DC <- read_delim("data/2_dataset_cleaning/manual_check_results/double_check/double_check_DRKS_results_IRR2+3.csv", delim = ",") %>%
   rename(publ_identified_DC = `Publication identified in which step`,
          publication_date_DC = publication_date,
          article_yes_no_DC = article_yes_no,
@@ -127,7 +127,7 @@ table(trials_compare$publ_identified_orig, trials_compare$publ_identified_DC, us
 #add summary results data
 
 #the AACT dataset has to be downloaded first from https://aact.ctti-clinicaltrials.org/pipe_files
-AACT_folder <- "data/AACT_20200603/" #insert the AACT download folder here
+AACT_folder <- "..." #insert the AACT download folder here
 
 #AACT filenames that we need to load
 AACT_dataset_names <- c("studies", "calculated_values")
@@ -174,7 +174,8 @@ IRR2
 #trials with differences
 trials_diff <- trials_compare[publ_difference_idx,]
 
-write_csv(trials_diff, "./manual_check/results/double_check_results/DC_trials_with_discrepancy.csv")
+write_csv(trials_diff, "data/2_dataset_cleaning/manual_check_results/double_check/DC_trials_with_discrepancy.csv")
+
 
 #--------------------------------------------------------------------------------------------------------
 # IRR 3
