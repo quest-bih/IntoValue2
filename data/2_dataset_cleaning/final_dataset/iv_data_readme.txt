@@ -1,6 +1,6 @@
 The IntoValue dataset contains clinical trials conducted at a German UMC and registered on ClinicalTrials.gov or the German Clinical Trials Registry (DRKS). All trials were reported as complete between 2009 and 2017 on the trial registry at the time of data collection. The dataset also includes a results publication found via manual searches; if multiple results publications were found, the earliest was included.
 
-Trials were associated with a German UMC by searching trials with UMC listed as responsible party, lead sponsor or with a principle investigator (PI) from a UMC ('lead_city'), or with a UMC only listed as facility (`facility_city`; version 1 only). A lookup table of German UMC regexes is available under `generated_samples/city_search_terms_no_abbrev.csv`.
+Trials were associated with a German UMC by searching for trials with a UMC listed as responsible party or lead sponsor, or with a principle investigator (PI) from a UMC ('lead_city'). Version 1 additionally includes trials with a UMC only as a facility (`facility_city`). A lookup table of regular expressions used to identify German UMCs is available at https://github.com/quest-bih/IntoValue2/blob/master/data/1_sample_generation/city_search_terms.csv.
 
 Trials include all interventional studies and are not limited to investigational medical product trials, as regulated by the EU's Clinical Trials Directive or Germany's Arzneimittelgesetz (AMG) or Novelle des Medizinproduktegesetzes (MPG).
 
@@ -13,16 +13,16 @@ For version 2, registry data was collected on June 3, 2020 and was limited to tr
 
 Publication identifiers (DOI, PMID, URL) were manually entered during the publication search and then further enhanced using the API of Internet Archive's open-source Fatcat catalog of research publications, to add PMIDs based on DOIs, and vice versa.
 
-Partially different manual search steps were used in the two versions and are indicated and described in `identification_step`.
+Manual search steps differed slightly in the two versions and are indicated and described in `identification_step`.
 Version 1 includes trials with a German UMC as either a `lead_city` or a `facility_city`, whereas version 2 is limited to trials a German UMC as a `lead_city`.
 
-Each row indicates a single trial registration. Due to changes in completion dates, some trials are duplicated between versions as indicated in `is_dupe`. Deduplication of cross-registration was manually performed and some trials are cross-registered duplicates remain (e.g., DRKS00004156 and NCT00215683) and are not indicated in the dataset.
+Each row indicates a single trial registration. Due to changes in completion dates, some trials are duplicated between versions as indicated in `is_dupe`. Cross-registered trials were manually deduplicated, and some cross-registered duplicates remain (e.g., DRKS00004156 and NCT00215683) and are not indicated in the dataset.
 
 All dates are provided as `yyyy-mm-dd`.
 
 Additional documentation on each variable (type, description, levels) is provided in `iv_data_dictionary.csv`.
 
-Additional information on the project and methods for generating the dataset is available in associated publications and at the project's OSF page (https://doi.org/10.17605/osf.io/fh426).
+Additional information on the project and methods for generating the dataset is available in associated publications and at the project's OSF page (https://doi.org/10.17605/osf.io/fh426). Code for the project is available at https://github.com/quest-bih/IntoValue2.
 
 References:
 - Wieschowski, S., Riedel, N., Wollmann, K., Kahrass, H., Müller-Ohlraun, S., Schürmann, C., Kelley, S., Kszuk, U., Siegerink, B., Dirnagl, U., Meerpohl, J., & Strech, D. (2019). Result dissemination from clinical trials conducted at German university medical centers was delayed and incomplete. Journal of Clinical Epidemiology, 115, 37–45. https://doi.org/10.1016/j.jclinepi.2019.06.002
