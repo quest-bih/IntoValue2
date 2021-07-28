@@ -164,7 +164,7 @@ description <- tribble(
   "Number of days from `registration_date` to `completion_date`. Derived.",
   
   "days_reg_to_pcd", 
-  "Number of days from `registration_date` to `primary_completion_date`. ClinicalTrials.gov only.",
+  "Number of days from `registration_date` to `primary_completion_date`. Derived. ClinicalTrials.gov only.",
   
   "days_reg_to_publication", 
   "Number of days from `registration_date` to `publication_date`. Derived.",
