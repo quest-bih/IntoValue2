@@ -215,38 +215,6 @@ set_compl_status <- function(compl_status_in) {
 }
 
 
-set_compl_status_delay <- function(compl_status_in) {
-  if(compl_status_in == "Any status") {
-    compl_status <- c("Completed", "Terminated", "Unknown status", "Suspended",
-                      "Recruiting complete, follow-up complete",
-                      "Recruiting stopped after recruiting started",
-                      "Recruiting suspended on temporary hold",
-                      "Active, not recruiting", "Enrolling by invitation",
-                      "Not yet recruiting", "Recruiting", "Withdrawn")
-  } else if(compl_status_in == "Completed") {
-    compl_status <- c("Completed", "Recruiting complete, follow-up complete")
-  } else if(compl_status_in == "Terminated") {
-    compl_status <- c("Terminated", "Recruiting stopped after recruiting started")
-  } else if(compl_status_in == "Suspended") {
-    compl_status <- c("Suspended", "Recruiting suspended on temporary hold")
-  } else if(compl_status_in == "Active, not recruiting") {
-    compl_status <- c("Active, not recruiting")
-  } else if(compl_status_in == "Enrolling by invitation") {
-    compl_status <- c("Enrolling by invitation")
-  } else if(compl_status_in == "Not yet recruiting") {
-    compl_status <- c("Not yet recruiting")
-  } else if(compl_status_in == "Recruiting") {
-    compl_status <- c("Recruiting")
-  } else if(compl_status_in == "Withdrawn") {
-    compl_status <- c("Withdrawn")
-  } else {
-    compl_status <- c("Unknown status")
-  }
-
-  return(compl_status)
-}
-
-
 set_sponsor_status <- function(sponsor_status_in) {
   if(sponsor_status_in == "Lead or Facility") {
     sponsor_status <- c("lead", "facility")
@@ -528,62 +496,6 @@ make_table_data <- function(input_table, summary_type_in, compl_status_in, spons
 
 
 
-#uses all the currently choosen input options to filter the dataset accordingly
-make_table_data_delay <- function(input_table, compl_status_in, multicentric_in,
-                                  industry_in, phase_sub_in,
-                                  intervention_in, participants_in, startyear_in)
-{
-  #set variables for subset options
-  compl_status <- set_compl_status_delay(compl_status_in)
-  multicentric <- set_multicentric_status(multicentric_in)
-  industry <- set_industry_status(industry_in)
-  phase_sub <- set_phase_status(phase_sub_in)
-  intervention <- set_intervention_status(intervention_in)
-  participants <- set_participants_status(participants_in)
-  startyear <- as.character(startyear_in[1]:startyear_in[2])
-
-
-  #finally add timeframe for delayed results
-  input_table[["delay"]] <- input_table$days_reg_to_start > -60
-
-
-  #filter for registration timepoint & completion status and group by cities
-  input_table_filtered <- input_table %>%
-    filter_participants(participants) %>%
-    filter(recruitment_status %in% compl_status) %>%
-    filter(is_multicentric %in% multicentric) %>%
-    filter(main_sponsor %in% industry) %>%
-    filter(phase %in% phase_sub) %>%
-    filter(intervention_type %in% intervention) %>%
-    filter(start_year %in% startyear)
-
-  table_cities <- input_table_filtered %>%
-    rbind(make_basic_city_tab(input_table, TRUE)) %>% #add the cities tibble to ensure that all cities are present in the results
-    group_by(city, delay) %>%
-    summarise(count = n(), enroll = sum(enrollment, na.rm = TRUE)) %>%
-    mutate(percent = (count-1)/(sum(count)-1)) %>% #remove the extra count from the cities column when calculating the percentage
-    mutate(total = sum(count) - 1)
-
-  #get the total number of participants per city
-  table_enroll_tot <- input_table_filtered %>%
-    rbind(make_basic_city_tab(input_table, TRUE)) %>%
-    group_by(city) %>%
-    summarise(enroll_tot = sum(enrollment, na.rm = TRUE))
-
-  table_data <- table_cities %>%
-    filter(delay == TRUE) %>%
-    add_column(enroll_tot = table_enroll_tot$enroll_tot) %>%
-    mutate(participants_unpubl = enroll_tot - enroll) %>%
-    rename(participants = enroll_tot) %>%
-    select(-enroll) %>%
-    arrange(desc(percent)) %>%
-    mutate(count = count - 1) #remove the extra count from the cities column
-
-  return(table_data)
-}
-
-
-
 #arranges data for display as table
 make_table <- function(input_table, summary_type_in, compl_status_in, sponsor_status_in,
                        compl_date_in, month_to_publ_in, reg_time_in, multicentric_in, industry_in, phase_sub_in,
@@ -646,35 +558,4 @@ make_plot_data <- function(input_table, summary_type_in, compl_status_in, sponso
 
   return(plot_data)
 }
-
-
-
-
-#arranges data for plotting
-make_plot_data_delay <- function(input_table, compl_status_in, multicentric_in,
-                                 industry_in, phase_sub_in,
-                                 intervention_in, participants_in, startyear_in)
-{
-  #first filter data according to input options
-  plot_data <- make_table_data_delay(input_table, compl_status_in, multicentric_in,
-                                     industry_in, phase_sub_in,
-                                     intervention_in, participants_in, startyear_in)
-
-  #modifications specific for plotting
-  plot_data$city <- factor(plot_data$city, levels = plot_data$city)
-
-
-  plot_data$bar_col <- ifelse(plot_data$city == "All trials combined", "#e9a602", "#5799c7") # #E97F02
-
-  plot_data$id = 1:dim(plot_data)[1]
-
-  plot_data$tooltip <- as.character(paste0("<b>", plot_data$city, "</b><br>",
-                                           plot_data$count, " timely registered studies <br>",
-                                           plot_data$count/plot_data$percent, " total studies"))
-
-
-  return(plot_data)
-}
-
-
 
