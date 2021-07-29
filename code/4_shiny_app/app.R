@@ -53,7 +53,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                                         can be found on the OSF project pages for the ", a(href = 'https://osf.io/fh426/', "first"),
                                          " and the ", a(href = 'https://osf.io/98j7u/', "second"), " study and ", 
                                          a(href = 'https://github.com/quest-bih/IntoValue2', "this"), " Github repository. The combined dataset
-                                                        for both studies can be found ", a(href = '...', "here"), 
+                                                        for both studies can be found ", a(href = 'https://doi.org/10.5281/zenodo.5141343', "here"), 
                                          "."))),
                           
                           br(),
@@ -133,7 +133,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                                         can be found on the OSF project pages for the ", a(href = 'https://osf.io/fh426/', "first"),
                                          " and the ", a(href = 'https://osf.io/98j7u/', "second"), " study and ", 
                                          a(href = 'https://github.com/quest-bih/IntoValue2', "this"), " Github repository. The combined dataset
-                                                        for both studies can be found ", a(href = '...', "here"), 
+                                                        for both studies can be found ", a(href = 'https://doi.org/10.5281/zenodo.5141343', "here"), 
                                          "."))),
                           br(),
                           fluidRow(
@@ -212,7 +212,7 @@ ui <- navbarPage("IntoValue", theme = shinytheme("flatly"),
                                                         can be found on the OSF project pages for the ", a(href = 'https://osf.io/fh426/', "first"),
                                          " and the ", a(href = 'https://osf.io/98j7u/', "second"), " study and ", 
                                          a(href = 'https://github.com/quest-bih/IntoValue2', "this"), " Github repository. The combined dataset
-                                                        for both studies can be found ", a(href = '...', "here"), 
+                                                        for both studies can be found ", a(href = 'https://doi.org/10.5281/zenodo.5141343', "here"), 
                                          "."))),
                           br(),
                           fluidRow(

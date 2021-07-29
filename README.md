@@ -1,6 +1,6 @@
 # IntoValue 2 Scripts
 
-This repository contains the scripts accompanying the IntoValue2 publication (...). The final, clean dataset generated during the two studies IntoValue 1 + 2 can also be found under ...
+This repository contains the scripts accompanying the IntoValue2 publication (...). The final, clean dataset generated during the two studies IntoValue 1 + 2 can also be found under https://doi.org/10.5281/zenodo.5141343.
 
 ## Description
 
@@ -21,4 +21,4 @@ The AACT dataset (https://aact.ctti-clinicaltrials.org/pipe_files) is necessary 
 
 ## License
 
-All analysis code is available under the MIT license. The final dataset is available under CC-BY license from xxx. See the [LICENSE](https://github.com/quest-bih/oddpub/blob/master/LICENSE) file for more info.
+All analysis code is available under the MIT license. The final dataset is available under CC-BY license from https://doi.org/10.5281/zenodo.5141343. See the [LICENSE](https://github.com/quest-bih/oddpub/blob/master/LICENSE) file for more info.
