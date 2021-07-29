@@ -1,4 +1,4 @@
-The IntoValue dataset contains clinical trials conducted at a German UMC and registered on ClinicalTrials.gov or the German Clinical Trials Registry (DRKS). All trials were reported as complete between 2009 and 2017 on the trial registry at the time of data collection. The dataset also includes a results publication found via manual searches; if multiple results publications were found, the earliest was included.
+The IntoValue dataset contains clinical trials conducted at one of 35 German UMCs and registered on ClinicalTrials.gov or the German Clinical Trials Registry (DRKS). All trials were reported as complete between 2009 and 2017 on the trial registry at the time of data collection. The dataset also includes a results publication found via manual searches; if multiple results publications were found, the earliest was included.
 
 Trials were associated with a German UMC by searching for trials with a UMC listed as responsible party or lead sponsor, or with a principle investigator (PI) from a UMC ('lead_city'). Version 1 additionally includes trials with a UMC only as a facility (`facility_city`). A lookup table of regular expressions used to identify German UMCs is available at https://github.com/quest-bih/IntoValue2/blob/master/data/1_sample_generation/city_search_terms.csv.
 
@@ -22,7 +22,7 @@ All dates are provided as `yyyy-mm-dd`.
 
 Additional documentation on each variable (type, description, levels) is provided in `iv_data_dictionary.csv`.
 
-Additional information on the project and methods for generating the dataset is available in associated publications and at the project's OSF page (https://doi.org/10.17605/osf.io/fh426). Code for the project is available at https://github.com/quest-bih/IntoValue2.
+Additional information on the project and methods for generating the dataset is available in associated publications and at the project's OSF page (https://osf.io/98j7u/). Code for the project is available at https://github.com/quest-bih/IntoValue2.
 
 References:
 - Wieschowski, S., Riedel, N., Wollmann, K., Kahrass, H., Müller-Ohlraun, S., Schürmann, C., Kelley, S., Kszuk, U., Siegerink, B., Dirnagl, U., Meerpohl, J., & Strech, D. (2019). Result dissemination from clinical trials conducted at German university medical centers was delayed and incomplete. Journal of Clinical Epidemiology, 115, 37–45. https://doi.org/10.1016/j.jclinepi.2019.06.002
