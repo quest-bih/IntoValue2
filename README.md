@@ -1,6 +1,6 @@
 # IntoValue 2 Scripts
 
-This repository contains the scripts accompanying the IntoValue2 publication (...). The final, clean dataset generated during the two studies IntoValue 1 + 2 can also be found under https://doi.org/10.5281/zenodo.5141343.
+This repository contains the scripts accompanying the IntoValue2 publication (https://doi.org/10.1101/2021.08.05.21261624). The final, clean dataset generated during the two studies IntoValue 1 + 2 can also be found under https://doi.org/10.5281/zenodo.5141343.
 
 ## Description
 
