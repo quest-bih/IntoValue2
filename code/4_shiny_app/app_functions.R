@@ -144,7 +144,7 @@ filter_followup_time <- function(input_table, followup_time, compl_date_in) {
   # and at beginning of Dec. 2020 for IV2
   # and take this as cutoff date for the timeframe
   cutoff_date_IV1 <- dmy("01.12.2017") - months(followup_time)
-  cutoff_date_IV2 <- dmy("01.12.2020") - months(followup_time)
+  cutoff_date_IV2 <- dmy("01.09.2020") - months(followup_time)
   
   if(compl_date_in == "Primary completion date (CT.gov only)") {
     compl_col <- "primary_completion_date"
