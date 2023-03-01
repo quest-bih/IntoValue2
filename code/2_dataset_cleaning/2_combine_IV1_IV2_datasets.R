@@ -2,38 +2,28 @@ library(tidyverse)
 library(lubridate)
 
 #----------------------------------------------------------------------------------------------------------------------
-# Loading of IV1 AACT dataset
+# Loading of IV1 & 2 AACT datasets
 #----------------------------------------------------------------------------------------------------------------------
 
-#the AACT dataset has to be downloaded first from https://aact.ctti-clinicaltrials.org/pipe_files
-#the IV1 AACT dataset was downloaded on 2017-04-16
-AACT_folder <- "..." #insert the AACT download folder here
+# Get registry data if not already downloaded/unzipped
+source(here::here("code", "0_get_registry_data.R"))
 
 #AACT filenames that we need to load
 AACT_dataset_names <- c("studies", "overall_officials", "sponsors", "responsible_parties",
                         "facilities", "interventions", "calculated_values")
 
-AACT_dataset_files <- paste0(AACT_folder, AACT_dataset_names, ".txt")
-AACT_datasets_IV1 <- AACT_dataset_files %>%
-  map(read_delim, delim = "|", guess_max = 20000)
+# IV1
+AACT_folder_IV1 <- here::here("data", "raw-registries", "2017-04-17_ctgov")
+AACT_dataset_files_IV1 <- paste0(AACT_folder_IV1, "/", AACT_dataset_names, ".txt")
+AACT_datasets_IV1 <- AACT_dataset_files_IV1 %>%
+  map(read_delim, delim = "|", guess_max = 50000)
 names(AACT_datasets_IV1) <- AACT_dataset_names
 
-
-#----------------------------------------------------------------------------------------------------------------------
-# Loading of IV2 AACT dataset
-#----------------------------------------------------------------------------------------------------------------------
-
-#the AACT dataset has to be downloaded first from https://aact.ctti-clinicaltrials.org/pipe_files
-#the IV2 AACT dataset was downloaded on 2020-06-03
-AACT_folder <- "..." #insert the AACT download folder here
-
-#AACT filenames that we need to load
-AACT_dataset_names <- c("studies", "overall_officials", "sponsors", "responsible_parties",
-                        "facilities", "interventions", "calculated_values")
-
-AACT_dataset_files <- paste0(AACT_folder, AACT_dataset_names, ".txt")
-AACT_datasets_IV2 <- AACT_dataset_files %>%
-  map(read_delim, delim = "|", guess_max = 20000)
+# IV2
+AACT_folder_IV2 <- here::here("data", "raw-registries", "2020-06-03_ctgov")
+AACT_dataset_files_IV2 <- paste0(AACT_folder_IV2, "/", AACT_dataset_names, ".txt")
+AACT_datasets_IV2 <- AACT_dataset_files_IV2 %>%
+  map(read_delim, delim = "|", guess_max = 50000)
 names(AACT_datasets_IV2) <- AACT_dataset_names
 
 
@@ -214,7 +204,7 @@ IntoValue_datasets_comb <-
   #convert is_ctgov to registry
   mutate(registry = if_else(is_CTgov, "ClinicalTrials.gov", "DRKS"), .keep = "unused") %>%
   
-  #add column on type of results (publication, disseration, summary results)
+  #add column on type of results (publication, dissertation, summary results)
   mutate(
     publication_type = case_when(
       has_publication ~ "journal publication"
