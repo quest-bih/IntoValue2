@@ -7,15 +7,16 @@ library(assertr)
 # Loading of AACT dataset for additional variables
 #----------------------------------------------------------------------------------------------------------------------
 
-#the AACT dataset has to be downloaded first from https://aact.ctti-clinicaltrials.org/pipe_files
-#the IV2 AACT dataset was downloaded on 2020-06-03
-AACT_folder <- "..." #insert the AACT download folder here
+# Get registry data if not already downloaded/unzipped
+source(here::here("code", "0_get_registry_data.R"))
+
+AACT_folder <- here::here("data", "raw-registries", "2020-06-03_ctgov")
 
 #AACT filenames that we need to load
 AACT_dataset_names <- c("studies", "overall_officials", "sponsors", "responsible_parties",
                         "facilities", "interventions", "calculated_values", "designs")
 
-AACT_dataset_files <- paste0(AACT_folder, AACT_dataset_names, ".txt")
+AACT_dataset_files <- paste0(AACT_folder, "/", AACT_dataset_names, ".txt")
 AACT_datasets <- AACT_dataset_files %>%
   map(read_delim, delim = "|", guess_max = 50000)
 names(AACT_datasets) <- AACT_dataset_names
@@ -35,7 +36,7 @@ AACT_studies <- AACT_datasets$studies %>% select(nct_id, results_first_submitted
 # Loading of full DRKS dataset for additional variables 
 #----------------------------------------------------------------------------------------------------------------------
 
-DRKS_add_columns <- read_delim("data/1_sample_generation/DRKS_downloaded.csv", delim = ";")  %>%
+DRKS_add_columns <- read_csv2(here::here("data", "raw-registries", "2020-06-03_drks.csv")) %>%
   select(drksId, allocation, masking, phase)
 
 
@@ -78,6 +79,7 @@ standardize_DRKS <- function(df) {
            main_sponsor = ifelse(investorInitiated == "yes", "Other", "Industry"))
   return(df_std)
 }
+
 
 #loading of manual results and standardize column names for joining
 CTgov_results <- read_csv("data/2_dataset_cleaning/manual_check_results/IntoValue2_CTgov_results_main_check_including_DC.csv") %>%
@@ -181,7 +183,7 @@ intovalue2_results <- intovalue2_results %>%
 
 
 #filter out studies that are not part of the trial, as no UMC was affiliated with them
-intovalue2_results <- intovalue2_results %>%
+intovalue2_results <- intovalue2_results %>% #filter(!is.na(identification_step))
   filter(identification_step != 9)
 
 

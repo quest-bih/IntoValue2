@@ -1,16 +1,13 @@
 #----------------------------------------------------------------------------------------------------------------------
 #
 # The following script creates the sample of trials with contributing German university medical centers (UMC)
-# from the clinicaltrials.gov database. Here, we rely on the AACT dataset, which brings the CT.gov database
-# content in an easily reusable format. As the AACT dataset is very big (several GB), this has to be
-# downloaded from https://aact.ctti-clinicaltrials.org/pipe_files by the user and the AACT folder
-# has to be inserted by the user in the first code line of the script.
-#
+# from the clinicaltrials.gov registry. Due to size, the raw registry data is stored in Zenodo and downloaded into the local project via a separate script.
+# 
 # The script searches the AACT dataset for affiliations of the sponsor/PI/responsible party/facilities
 # associated with the different UMCs (keywords are loaded from city_search_terms.csv). It also filters
 # the relevant completion years and study status (Completed, Terminated, Suspended, Unknown status).
 #
-# The script saves a filtered version of the dataset, only containing the relevant trials. Please be
+# The script saves a filtered version of the dataset, containing only relevant trials. Please be
 # aware that the filtered dataset still contains false positives (i.e. trials that were found with the
 # keywords but that were not associated with the UMCs - e.g. when a communal hospital in Berlin was found
 # by the keyword "Berlin"). All trial affiliations were checked during the manual publication search to
@@ -25,15 +22,16 @@ library(tidyverse)
 # Loading of AACT dataset
 #----------------------------------------------------------------------------------------------------------------------
 
-#the AACT dataset has to be downloaded first from https://aact.ctti-clinicaltrials.org/pipe_files
-#the IV2 AACT dataset was downloaded on 2020-06-03
-AACT_folder <- "..." #insert the AACT download folder here
+# Get registry data if not already downloaded/unzipped
+source(here::here("code", "0_get_registry_data.R"))
+
+AACT_folder <- here::here("data", "raw-registries", "2020-06-03_ctgov")
 
 #AACT filenames that we need to load
 AACT_dataset_names <- c("studies", "overall_officials", "sponsors", "responsible_parties",
                         "facilities", "interventions", "calculated_values")
 
-AACT_dataset_files <- paste0(AACT_folder, AACT_dataset_names, ".txt")
+AACT_dataset_files <- paste0(AACT_folder, "/", AACT_dataset_names, ".txt")
 AACT_datasets <- AACT_dataset_files %>%
   map(read_delim, delim = "|")
 names(AACT_datasets) <- AACT_dataset_names
@@ -201,5 +199,5 @@ CTgov_sample_save <- CTgov_sample %>%
 #save CT.gov trial sample
 #please be aware that not all associations of the trials to the cites are correct (there are still false positives)
 #such that the city associations had to be checked manually during publication search
-write_delim(CTgov_sample_save, "data/1_sample_generation/IntoValue2_CTgov_sample.csv", delim = ";", na = "")
+write_csv2(CTgov_sample_save, here::here("data", "1_sample_generation", "IntoValue2_CTgov_sample.csv"), na = "")
 

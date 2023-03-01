@@ -1,14 +1,12 @@
 #----------------------------------------------------------------------------------------------------------------------
 #
 # The following script creates the sample of trials with contributing German university medical centers (UMC)
-# from the DRKS database. Here, a pre-filtered version of the dataset was downloaded from the DRKS database
-# (found in DRKS_search_results_2009-2014.csv), filtering for completion years and study status as well as
-# Germany as 'Country of recruitment'.
+# from the DRKS database. Due to size, the raw registry data is stored in Zenodo and downloaded into the local project via a separate script.
 #
 # The script searches the DRKS dataset for affiliations of the sponsor/PI/responsible party/recruitment locations
 # associated with the different UMCs (keywords are loaded from city_search_terms.csv).
 #
-# The script saves a filtered version of the dataset, only containing the relevant trials. Please be
+# The script saves a filtered version of the dataset, containing only relevant trials. Please be
 # aware that the filtered dataset still contains false positives (i.e. trials that were found with the
 # keywords but that were not associated with the UMCs - e.g. when a communal hospital in Berlin was found
 # by the keyword "Berlin"). All trial affiliations were checked during the manual publication search to
@@ -24,14 +22,17 @@ library(lubridate)
 # Data loading and transformation
 #----------------------------------------------------------------------------------------------------------------------
 
+# Get registry data if not already downloaded/unzipped
+source(here::here("code", "0_get_registry_data.R"))
+
+DRKS_sample <- read_csv2(here::here("data", "raw-registries", "2020-06-03_drks.csv"))
+
 completion_years <- c("2014", "2015", "2016", "2017") %>%
   paste(collapse="|")
 
-#data downloaded from DRKS with specified search query
-DRKS_sample <- read_delim("data/1_sample_generation/DRKS_downloaded.csv", delim = ";")
 DRKS_sample <- DRKS_sample %>%
   arrange(drksId) %>%
-  filter(grepl(completion_years, studyEnd))  #select only years with study end between 2009 and 2013
+  filter(grepl(completion_years, studyEnd))
 
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -122,8 +123,7 @@ nct_pos <- unlist(nct_pos)
 
 entry_num <- dim(DRKS_sample)[1]
 ncts <- rep("", entry_num)
-for(i in 1:entry_num)
-{
+for(i in 1:entry_num) {
   if(is.na(nct_pos[i])) {
     ncts[i] <- NA
   } else {
@@ -134,7 +134,22 @@ for(i in 1:entry_num)
 #add information on NCT-ids and filter studies with NCT (and thus are already registered on CT.gov)
 DRKS_sample <- DRKS_sample %>%
   add_column(has_nct_id = nct_entries) %>%
-  add_column(nct_id = ncts) %>%
+  add_column(nct_id = ncts) 
+
+#add information on whether NCTs in ctgov sample
+ctgov_sample <- readr::read_csv2(here::here("data", "1_sample_generation", "IntoValue2_CTgov_sample.csv"))
+
+DRKS_sample <- DRKS_sample %>%
+  mutate(in_ctgov_sample = if_else(nct_id %in% ctgov_sample$nct_id, TRUE, FALSE))
+
+#get counts of drks trials with NCTs and those in ctgov sample
+# 29 trials in drks with NCTs in drks secondary identifiers
+# 1 of these not in ctgov sample, but remove from drks anyways
+count(DRKS_sample, has_nct_id, in_ctgov_sample)
+
+
+#remove trials with NCT from drks sample
+DRKS_sample <- DRKS_sample %>%
   filter(has_nct_id == FALSE)
 
 DRKS_sample_save <- DRKS_sample %>%
@@ -159,4 +174,4 @@ DRKS_sample_save <- DRKS_sample %>%
 
 
 #save DRKS trial sample
-write_delim(DRKS_sample_save, "data/1_sample_generation/IntoValue2_DRKS_sample.csv", delim = ";", na = "")
+write_csv2(DRKS_sample_save, here::here("data", "1_sample_generation", "IntoValue2_DRKS_sample.csv"), na = "")
