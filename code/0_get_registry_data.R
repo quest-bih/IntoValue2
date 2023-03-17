@@ -31,7 +31,13 @@ if (
   # 1) check if zip downloaded and otherwise download
   # NOTE: if code-based download fails, manually download: navigate to https://doi.org/10.5281/zenodo.7633995 --> click "Download" by `raw-registries.zip` --> move zip file to `data` directory in this project
   message("Downloading raw registry data...")
-  download.file("https://zenodo.org/record/7633995/files/raw-registries.zip?download=1", zip_raw_reg)
+  tryCatch(
+    download.file("https://zenodo.org/record/7633995/files/raw-registries.zip",
+                  zip_raw_reg),
+    error = \(c) paste0(c$message, " when trying to download file, perhaps retry with a more stable connection?")
+    
+  )
+  
 }
   
   # 2) unzip `raw-registries`
