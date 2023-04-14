@@ -27,6 +27,10 @@ source(here::here("code", "0_get_registry_data.R"))
 
 DRKS_sample <- read_csv2(here::here("data", "raw-registries", "2020-06-03_drks.csv"))
 
+# NOTE: Warning appears when reading in `DRKS_sample`, which seems to have some misaligned cells
+# Run `problems(DRKS_sample)` to see problems listed
+# Note: `DRKS_sample |> filter(drksId == "DRKS00008870") |> pull(studyEnd)` is not corrupted data but rather an error on the registry: https://drks.de/search/en/trial/DRKS00008870
+
 completion_years <- c("2014", "2015", "2016", "2017") %>%
   paste(collapse="|")
 
@@ -183,3 +187,15 @@ DRKS_sample_save <- DRKS_sample %>%
 
 #save DRKS trial sample
 write_csv2(DRKS_sample_save, here::here("data", "1_sample_generation", "IntoValue2_DRKS_sample.csv"), na = "")
+
+# NOTE: For manual searches, additional columns later added
+# [1] "publication_PMID"                    
+# [2] "publication_DOI"                     
+# [3] "publication_URL"                     
+# [4] "article_yes_no"                      
+# [5] "publication_date"                    
+# [6] "unsure_about_publ_yes_no"            
+# [7] "reason"                              
+# [8] "other_comments"                      
+# [9] "Publication identified in which step"
+# [10] "manual_validation_cities_lead"   
