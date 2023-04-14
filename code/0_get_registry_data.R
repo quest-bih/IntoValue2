@@ -67,3 +67,5 @@ if (
     message("Raw registry data successfully unzipped")
   }
 }
+
+if (fs::dir_exists(dir_raw_reg)) {message("Raw registry data available locally")}
