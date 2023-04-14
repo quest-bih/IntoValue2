@@ -135,7 +135,7 @@ for(i in 1:entry_num) {
   }
 }
 
-# All NCTs in DRKS sample
+# All NCTs in DRKS sample (n = 29)
 ncts_exist <- ncts[complete.cases(ncts)]
 
 #add information on NCT-ids and filter studies with NCT (and thus are already registered on CT.gov)
