@@ -12,6 +12,9 @@ The repository is structured into three blocks
          1. Navigate to https://doi.org/10.5281/zenodo.7633995
          2. Click "Download" by `raw-registries.zip`
          3. Move zip file to `data` directory in this project
+      - NOTE: If code-based unzipping fails, please manually unzip the raw data:
+         1. Navigate to `data` directory in this project
+         2. Unzip `raw-registries.zip` (e.g., double click on MacOS)
    - 1_sample_generation: scripts involved in creating the trial samples
    - 2_dataset_cleaning: scripts involved in cleaning and combining the data to the final dataset after the manual publication search
    - 3_results analysis: scripts used to create the plots, tables and analyses used in the publication 
