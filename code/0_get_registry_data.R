@@ -29,20 +29,41 @@ if (
 ) { if (!fs::file_exists(zip_raw_reg)) {
   
   # 1) check if zip downloaded and otherwise download
-  # NOTE: if code-based download fails, manually download: navigate to https://doi.org/10.5281/zenodo.7633995 --> click "Download" by `raw-registries.zip` --> move zip file to `data` directory in this project
   message("Downloading raw registry data...")
-  tryCatch(
-    download.file("https://zenodo.org/record/7633995/files/raw-registries.zip",
-                  zip_raw_reg),
-    error = \(c) paste0(c$message, " when trying to download file, perhaps retry with a more stable connection?")
-    
+  
+  # Try to download zip file and, if fails, prompt user to manually download
+  download_zip <- try(
+    download.file("https://zenodo.org/record/7633995/files/raw-registries.zip",zip_raw_reg),
+    silent = TRUE
   )
+  
+  # Download failure
+  if (class(download_zip) == "try-error"){
+    if (fs::file_exists(zip_raw_reg)) {fs::file_delete(zip_raw_reg)}
+    stop("Download failed! Please manually download: navigate to https://doi.org/10.5281/zenodo.7633995 --> click `Download` by `raw-registries.zip` --> move zip file to `data` directory in this project")
+  }
+  
+  # Download success
+  if (class(download_zip) != "try-error"){
+    message("Raw registry data successfully downloaded")
+  }
   
 }
   
   # 2) unzip `raw-registries`
   message("Unzipping raw registry data...")
-  # TODO change to `archive` package
-  unzip(zip_raw_reg, exdir = fs::path("data"))
-  message("Raw registry data now available locally")
+  
+  # Try to unzip zip file and, if fails, prompt user to manually unzip
+  unzip_zip <- try(archive::archive_extract(zip_raw_reg, fs::path_wd("data")), silent = TRUE)
+  
+  # Unzip failure
+  if (class(unzip_zip) == "try-error"){
+    if (fs::dir_exists(dir_raw_reg)) {fs::dir_delete(dir_raw_reg)}
+    stop("Unzip failed! Please manually unzip in `raw-registries.zip` in `data` directory in this project")
+  }
+  
+  # Unzip success
+  if (class(unzip_zip) != "try-error"){
+    message("Raw registry data successfully unzipped")
+  }
 }
