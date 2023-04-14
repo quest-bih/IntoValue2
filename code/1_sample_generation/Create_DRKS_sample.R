@@ -131,6 +131,9 @@ for(i in 1:entry_num) {
   }
 }
 
+# All NCTs in DRKS sample
+ncts_exist <- ncts[complete.cases(ncts)]
+
 #add information on NCT-ids and filter studies with NCT (and thus are already registered on CT.gov)
 DRKS_sample <- DRKS_sample %>%
   add_column(has_nct_id = nct_entries) %>%
@@ -154,6 +157,11 @@ DRKS_sample <- DRKS_sample %>%
 
 DRKS_sample_save <- DRKS_sample %>%
   rename(startDate_plannedActual = plannedActual) %>% 
+  mutate(
+    startDate = as.Date(startDate),
+    studyEnd = as.Date(studyEnd),
+    targetSize = as.numeric(targetSize)
+  ) %>% 
   select(drksId, cities_lead, title,
          firstDrksPublishDate, startDate,
          startDate_plannedActual, studyEnd,
